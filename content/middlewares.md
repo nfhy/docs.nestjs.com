@@ -1,26 +1,23 @@
-### Middleware
+### 中间件
 
-Middleware is a function which is called **before** the route handler. Middleware functions have access to the [request](https://expressjs.com/en/4x/api.html#req) and [response](https://expressjs.com/en/4x/api.html#res) objects, and the `next()` middleware function in the application’s request-response cycle. The **next** middleware function is commonly denoted by a variable named `next`.
+中间件是一个在路由处理器**之前**被调用的函数。中间件函数可以访问[请求](https://expressjs.com/en/4x/api.html#req)和[响应](https://expressjs.com/en/4x/api.html#res)对象，以及应用请求-响应循环中的`next()`中间件函数。通常用一个名为`next`的变量来表示`next`中间件函数。
 
 <figure><img class="illustrative-image" src="/assets/Middlewares_1.png" /></figure>
 
-Nest middleware are, by default, equivalent to [express](https://expressjs.com/en/guide/using-middleware.html) middleware. The following description from the official express documentation describes the capabilities of middleware:
+Nest中间件默认等同于[express](https://expressjs.com/en/guide/using-middleware.html)中间件。以下是官方express文档对中间件能力的描述：
 
 <blockquote class="external">
-  Middleware functions can perform the following tasks:
+  中间件函数可以执行以下任务：
   <ul>
-    <li>execute any code.</li>
-    <li>make changes to the request and the response objects.</li>
-    <li>end the request-response cycle.</li>
-    <li>call the next middleware function in the stack.</li>
-    <li>if the current middleware function does not end the request-response cycle, it must call <code>next()</code> to
-      pass control to the next middleware function. Otherwise, the request will be left hanging.</li>
+    <li>执行任何代码。</li>
+    <li>对请求和响应对象进行更改。</li>
+    <li>结束请求-响应循环。</li>
+    <li>调用堆栈中的下一个中间件函数。</li>
+    <li>如果当前中间件函数没有结束请求-响应循环，它必须调用<code>next()</code>以将控制权传递给下一个中间件函数。否则，请求将被挂起。</li>
   </ul>
 </blockquote>
 
-You implement custom Nest middleware in either a function, or in a class with an `@Injectable()` decorator. The class should implement the `NestMiddleware` interface, while the function does not have any special requirements. Let's start by implementing a simple middleware feature using the class method.
-
-> warning **Warning** `Express` and `fastify` handle middleware differently and provide different method signatures, read more [here](/techniques/performance#middleware).
+你可以通过函数或带有`@Injectable()`装饰器的类来实现自定义Nest中间件。类应该实现`NestMiddleware`接口，而函数没有任何特殊要求。让我们首先通过类方法实现一个简单的中间件特性。
 
 ```typescript
 @@filename(logger.middleware)
@@ -30,7 +27,7 @@ import { Request, Response, NextFunction } from 'express';
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    console.log('Request...');
+    console.log('请求...');
     next();
   }
 }
@@ -40,19 +37,19 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class LoggerMiddleware {
   use(req, res, next) {
-    console.log('Request...');
+    console.log('请求...');
     next();
   }
 }
 ```
 
-#### Dependency injection
+#### 依赖注入
 
-Nest middleware fully supports Dependency Injection. Just as with providers and controllers, they are able to **inject dependencies** that are available within the same module. As usual, this is done through the `constructor`.
+Nest中间件完全支持依赖注入。就像提供者和控制器一样，它们能够**注入**在同一模块中可用的依赖项。通常，这是通过`constructor`完成的。
 
-#### Applying middleware
+#### 应用中间件
 
-There is no place for middleware in the `@Module()` decorator. Instead, we set them up using the `configure()` method of the module class. Modules that include middleware have to implement the `NestModule` interface. Let's set up the `LoggerMiddleware` at the `AppModule` level.
+`@Module()`装饰器中没有中间件的位置。相反，我们使用模块类的`configure()`方法来设置它们。包含中间件的模块必须实现`NestModule`接口。让我们在`AppModule`级别设置`LoggerMiddleware`。
 
 ```typescript
 @@filename(app.module)
@@ -87,7 +84,7 @@ export class AppModule {
 }
 ```
 
-In the above example we have set up the `LoggerMiddleware` for the `/cats` route handlers that were previously defined inside the `CatsController`. We may also further restrict a middleware to a particular request method by passing an object containing the route `path` and request `method` to the `forRoutes()` method when configuring the middleware. In the example below, notice that we import the `RequestMethod` enum to reference the desired request method type.
+在上面的例子中，我们已经为`CatsController`中先前定义的`/cats`路由处理器设置了`LoggerMiddleware`。我们还可以进一步通过将包含路由`path`和请求`method`的对象传递给`forRoutes()`方法来限制中间件仅适用于特定请求方法。在下面的示例中，注意我们导入了`RequestMethod`枚举来引用所需的请求方法类型。
 
 ```typescript
 @@filename(app.module)
@@ -122,13 +119,13 @@ export class AppModule {
 }
 ```
 
-> info **Hint** The `configure()` method can be made asynchronous using `async/await` (e.g., you can `await` completion of an asynchronous operation inside the `configure()` method body).
+> 提示 **提示** `configure()`方法可以异步化使用`async/await`（例如，你可以在`configure()`方法体内`await`异步操作的完成）。
 
-> warning **Warning** When using the `express` adapter, the NestJS app will register `json` and `urlencoded` from the package `body-parser` by default. This means if you want to customize that middleware via the `MiddlewareConsumer`, you need to turn off the global middleware by setting the `bodyParser` flag to `false` when creating the application with `NestFactory.create()`.
+> 警告 **警告** 当使用`express`适配器时，NestJS应用默认会注册`body-parser`包中的`json`和`urlencoded`。这意味着如果你想通过`MiddlewareConsumer`自定义该中间件，你需要在创建应用时将`bodyParser`标志设置为`false`。
 
-#### Route wildcards
+#### 路由通配符
 
-Pattern based routes are supported as well. For instance, the asterisk is used as a **wildcard**, and will match any combination of characters:
+也支持基于模式的路由。例如，星号用作**通配符**，将匹配任意字符组合：
 
 ```typescript
 forRoutes({
@@ -137,13 +134,13 @@ forRoutes({
 });
 ```
 
-The `'ab*cd'` route path will match `abcd`, `ab_cd`, `abecd`, and so on. The characters `?`, `+`, `*`, and `()` may be used in a route path, and are subsets of their regular expression counterparts. The hyphen ( `-`) and the dot (`.`) are interpreted literally by string-based paths.
+`'ab*cd'`路由路径将匹配`abcd`、`ab_cd`、`abecd`等。字符`?`、`+`、`*`和`()`可以在路由路径中使用，并且是它们正则表达式对应物的子集。连字符（`-`）和点（`.`）在基于字符串的路径中被字面解释。
 
-> warning **Warning** The `fastify` package uses the latest version of the `path-to-regexp` package, which no longer supports wildcard asterisks `*`. Instead, you must use parameters (e.g., `(.*)`, `:splat*`).
+> 警告 **警告** `fastify`包使用的是`path-to-regexp`包的最新版本，该版本不再支持通配符星号`*`。相反，你必须使用参数（例如，`(.*)`、`:splat*`）。
 
-#### Middleware consumer
+#### 中间件消费者
 
-The `MiddlewareConsumer` is a helper class. It provides several built-in methods to manage middleware. All of them can be simply **chained** in the [fluent style](https://en.wikipedia.org/wiki/Fluent_interface). The `forRoutes()` method can take a single string, multiple strings, a `RouteInfo` object, a controller class and even multiple controller classes. In most cases you'll probably just pass a list of **controllers** separated by commas. Below is an example with a single controller:
+`MiddlewareConsumer`是一个辅助类。它提供了几个内置方法来管理中间件。所有这些方法都可以简单地**链式**在[流畅风格](https://en.wikipedia.org/wiki/Fluent_interface)中。`forRoutes()`方法可以接收一个单独的字符串、多个字符串、一个`RouteInfo`对象、一个控制器类，甚至是多个控制器类。在大多数情况下，你可能只会传递一个由逗号分隔的**控制器**列表。下面是一个单一控制器的示例：
 
 ```typescript
 @@filename(app.module)
@@ -180,11 +177,11 @@ export class AppModule {
 }
 ```
 
-> info **Hint** The `apply()` method may either take a single middleware, or multiple arguments to specify <a href="/middleware#multiple-middleware">multiple middlewares</a>.
+> 提示 **提示** `apply()`方法可以接收单个中间件，或者多个参数来指定<a href="/middleware#multiple-middleware">多个中间件</a>。
 
-#### Excluding routes
+#### 排除路由
 
-At times we want to **exclude** certain routes from having the middleware applied. We can easily exclude certain routes with the `exclude()` method. This method can take a single string, multiple strings, or a `RouteInfo` object identifying routes to be excluded, as shown below:
+有时我们想要**排除**某些路由，使其不应用中间件。我们可以使用`exclude()`方法轻松排除某些路由。此方法可以接收一个单独的字符串、多个字符串，或一个`RouteInfo`对象，以识别要排除的路由，如下所示：
 
 ```typescript
 consumer
@@ -197,30 +194,30 @@ consumer
   .forRoutes(CatsController);
 ```
 
-> info **Hint** The `exclude()` method supports wildcard parameters using the [path-to-regexp](https://github.com/pillarjs/path-to-regexp#parameters) package.
+> 提示 **提示** `exclude()`方法支持使用[path-to-regexp](https://github.com/pillarjs/path-to-regexp#parameters)包的通配符参数。
 
-With the example above, `LoggerMiddleware` will be bound to all routes defined inside `CatsController` **except** the three passed to the `exclude()` method.
+通过上述示例，`LoggerMiddleware`将被绑定到`CatsController`中定义的所有路由**除外**传递给`exclude()`方法的三个路由。
 
-#### Functional middleware
+#### 功能性中间件
 
-The `LoggerMiddleware` class we've been using is quite simple. It has no members, no additional methods, and no dependencies. Why can't we just define it in a simple function instead of a class? In fact, we can. This type of middleware is called **functional middleware**. Let's transform the logger middleware from class-based into functional middleware to illustrate the difference:
+我们一直在使用的`LoggerMiddleware`类非常简单。它没有成员，没有额外的方法，也没有依赖项。为什么我们不能只定义一个简单的函数而不是类呢？实际上，我们可以。这种类型的中间件被称为**功能性中间件**。让我们将日志记录中间件从基于类的转换为功能性中间件以说明差异：
 
 ```typescript
 @@filename(logger.middleware)
 import { Request, Response, NextFunction } from 'express';
 
 export function logger(req: Request, res: Response, next: NextFunction) {
-  console.log(`Request...`);
+  console.log(`请求...`);
   next();
 };
 @@switch
 export function logger(req, res, next) {
-  console.log(`Request...`);
+  console.log(`请求...`);
   next();
 };
 ```
 
-And use it within the `AppModule`:
+并在`AppModule`中使用它：
 
 ```typescript
 @@filename(app.module)
@@ -229,19 +226,19 @@ consumer
   .forRoutes(CatsController);
 ```
 
-> info **Hint** Consider using the simpler **functional middleware** alternative any time your middleware doesn't need any dependencies.
+> 提示 **提示** 任何时候你的中间件不需要依赖项，考虑使用更简单的**功能性中间件**替代方案。
 
-#### Multiple middleware
+#### 多个中间件
 
-As mentioned above, in order to bind multiple middleware that are executed sequentially, simply provide a comma separated list inside the `apply()` method:
+如上所述，为了按顺序绑定多个中间件，只需在`apply()`方法中提供一个逗号分隔的列表：
 
 ```typescript
 consumer.apply(cors(), helmet(), logger).forRoutes(CatsController);
 ```
 
-#### Global middleware
+#### 全局中间件
 
-If we want to bind middleware to every registered route at once, we can use the `use()` method that is supplied by the `INestApplication` instance:
+如果我们想要一次性将中间件绑定到每个注册的路由，我们可以使用`INestApplication`实例提供的`use()`方法：
 
 ```typescript
 @@filename(main)
@@ -250,4 +247,4 @@ app.use(logger);
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-> info **Hint** Accessing the DI container in a global middleware is not possible. You can use a [functional middleware](middleware#functional-middleware) instead when using `app.use()`. Alternatively, you can use a class middleware and consume it with `.forRoutes('*')` within the `AppModule` (or any other module).
+> 提示 **提示** 在全局中间件中访问DI容器是不可能的。当使用`app.use()`时，你可以使用[功能性中间件](middleware#functional-middleware)。或者，你可以使用类中间件，并在`AppModule`（或任何其他模块）中使用`.forRoutes('*')`消费它。

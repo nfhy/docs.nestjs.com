@@ -1,16 +1,16 @@
-### Circular dependency
+循环依赖
 
-A circular dependency occurs when two classes depend on each other. For example, class A needs class B, and class B also needs class A. Circular dependencies can arise in Nest between modules and between providers.
+循环依赖发生在两个类相互依赖时。例如，类A需要类B，而类B也需要类A。循环依赖可能在Nest中出现在模块之间和提供者之间。
 
-While circular dependencies should be avoided where possible, you can't always do so. In such cases, Nest enables resolving circular dependencies between providers in two ways. In this chapter, we describe using **forward referencing** as one technique, and using the **ModuleRef** class to retrieve a provider instance from the DI container as another.
+虽然应尽可能避免循环依赖，但有时无法避免。在这种情况下，Nest允许通过两种方式解决提供者之间的循环依赖。在本章中，我们描述了使用**向前引用**作为一项技术，以及使用**ModuleRef**类从DI容器中检索提供者实例作为另一种技术。
 
-We also describe resolving circular dependencies between modules.
+我们还描述了解决模块之间的循环依赖。
 
-> warning **Warning** A circular dependency might also be caused when using "barrel files"/index.ts files to group imports. Barrel files should be omitted when it comes to module/provider classes. For example, barrel files should not be used when importing files within the same directory as the barrel file, i.e. `cats/cats.controller` should not import `cats` to import the `cats/cats.service` file. For more details please also see [this github issue](https://github.com/nestjs/nest/issues/1181#issuecomment-430197191).
+> 警告 **警告** 当使用“桶文件”/index.ts文件来分组导入时，也可能导致循环依赖。桶文件在涉及模块/提供者类时应省略。例如，桶文件不应在导入与桶文件同一目录下的文件时使用，即 `cats/cats.controller` 不应导入 `cats` 以导入 `cats/cats.service` 文件。更多详情请参阅[这个GitHub问题](https://github.com/nestjs/nest/issues/1181#issuecomment-430197191)。
 
-#### Forward reference
+#### 向前引用
 
-A **forward reference** allows Nest to reference classes which aren't yet defined using the `forwardRef()` utility function. For example, if `CatsService` and `CommonService` depend on each other, both sides of the relationship can use `@Inject()` and the `forwardRef()` utility to resolve the circular dependency. Otherwise Nest won't instantiate them because all of the essential metadata won't be available. Here's an example:
+**向前引用**允许Nest引用尚未定义的类，使用`forwardRef()`实用函数。例如，如果`CatsService`和`CommonService`相互依赖，关系的双方都可以使用`@Inject()`和`forwardRef()`实用函数来解决循环依赖。否则Nest不会实例化它们，因为所有必要的元数据将不可用。这里有一个例子：
 
 ```typescript
 @@filename(cats.service)
@@ -31,9 +31,9 @@ export class CatsService {
 }
 ```
 
-> info **Hint** The `forwardRef()` function is imported from the `@nestjs/common` package.
+> 提示 **提示** `forwardRef()`函数从`@nestjs/common`包导入。
 
-That covers one side of the relationship. Now let's do the same with `CommonService`:
+这涵盖了关系的一边。现在让我们对`CommonService`做同样的处理：
 
 ```typescript
 @@filename(common.service)
@@ -54,15 +54,15 @@ export class CommonService {
 }
 ```
 
-> warning **Warning** The order of instantiation is indeterminate. Make sure your code does not depend on which constructor is called first. Having circular dependencies depend on providers with `Scope.REQUEST` can lead to undefined dependencies. More information available [here](https://github.com/nestjs/nest/issues/5778)
+> 警告 **警告** 实例化顺序是不确定的。确保你的代码不依赖于哪个构造函数先被调用。具有`Scope.REQUEST`的循环依赖可能导致未定义的依赖。更多信息可在此查看[这里](https://github.com/nestjs/nest/issues/5778)。
 
-#### ModuleRef class alternative
+#### ModuleRef类替代方案
 
-An alternative to using `forwardRef()` is to refactor your code and use the `ModuleRef` class to retrieve a provider on one side of the (otherwise) circular relationship. Learn more about the `ModuleRef` utility class [here](/fundamentals/module-ref).
+使用`forwardRef()`的替代方案是重构代码，使用`ModuleRef`类来检索（原本）循环关系一侧的提供者。了解更多关于`ModuleRef`实用类的[这里](/fundamentals/module-ref)。
 
-#### Module forward reference
+#### 模块向前引用
 
-In order to resolve circular dependencies between modules, use the same `forwardRef()` utility function on both sides of the modules association. For example:
+为了解决模块之间的循环依赖，使用相同的`forwardRef()`实用函数在模块关联的两边。例如：
 
 ```typescript
 @@filename(common.module)
@@ -72,7 +72,7 @@ In order to resolve circular dependencies between modules, use the same `forward
 export class CommonModule {}
 ```
 
-That covers one side of the relationship. Now let's do the same with `CatsModule`:
+这涵盖了关系的一边。现在让我们对`CatsModule`做同样的处理：
 
 ```typescript
 @@filename(cats.module)

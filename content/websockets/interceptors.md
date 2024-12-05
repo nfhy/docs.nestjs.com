@@ -1,6 +1,6 @@
-### Interceptors
+### 拦截器
 
-There is no difference between [regular interceptors](/interceptors) and web sockets interceptors. The following example uses a manually instantiated method-scoped interceptor. Just as with HTTP based applications, you can also use gateway-scoped interceptors (i.e., prefix the gateway class with a `@UseInterceptors()` decorator).
+常规拦截器和WebSocket拦截器之间没有区别。以下示例使用了手动实例化的、方法作用域的拦截器。就像基于HTTP的应用程序一样，你也可以使用网关作用域的拦截器（即，在网关类前加上`@UseInterceptors()`装饰器）。
 
 ```typescript
 @@filename()

@@ -1,13 +1,13 @@
-### Global prefix
+### 全局前缀
 
-To set a prefix for **every route** registered in an HTTP application, use the `setGlobalPrefix()` method of the `INestApplication` instance.
+要在HTTP应用程序中为**所有路由**设置一个前缀，可以使用`INestApplication`实例的`setGlobalPrefix()`方法。
 
 ```typescript
 const app = await NestFactory.create(AppModule);
 app.setGlobalPrefix('v1');
 ```
 
-You can exclude routes from the global prefix using the following construction:
+你可以使用以下构造排除全局前缀的路由：
 
 ```typescript
 app.setGlobalPrefix('v1', {
@@ -15,10 +15,10 @@ app.setGlobalPrefix('v1', {
 });
 ```
 
-Alternatively, you can specify route as a string (it will apply to every request method):
+或者，你可以指定一个字符串形式的路由（它将适用于每个请求方法）：
 
 ```typescript
 app.setGlobalPrefix('v1', { exclude: ['cats'] });
 ```
 
-> info **Hint** The `path` property supports wildcard parameters using the [path-to-regexp](https://github.com/pillarjs/path-to-regexp#parameters) package. Note: this does not accept wildcard asterisks `*`. Instead, you must use parameters (e.g., `(.*)`, `:splat*`).
+> 信息 **提示** `path`属性支持使用[path-to-regexp](https://github.com/pillarjs/path-to-regexp#parameters)包的通配符参数。注意：这不接受通配符星号`*`。相反，你必须使用参数（例如，`(.*)`，`:splat*`）。

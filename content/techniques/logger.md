@@ -1,21 +1,21 @@
-### Logger
+### 日志记录器
 
-Nest comes with a built-in text-based logger which is used during application bootstrapping and several other circumstances such as displaying caught exceptions (i.e., system logging). This functionality is provided via the `Logger` class in the `@nestjs/common` package. You can fully control the behavior of the logging system, including any of the following:
+Nest 提供了一个内置的基于文本的日志记录器，用于应用程序启动和几个其他情况，例如显示捕获的异常（即系统日志记录）。此功能通过 `@nestjs/common` 包中的 `Logger` 类提供。你可以完全控制日志记录系统的行为，包括以下任何选项：
 
-- disable logging entirely
-- specify the log level of detail (e.g., display errors, warnings, debug information, etc.)
-- override timestamp in the default logger (e.g., use ISO8601 standard as date format)
-- completely override the default logger
-- customize the default logger by extending it
-- make use of dependency injection to simplify composing and testing your application
+- 完全禁用日志记录
+- 指定日志详细程度（例如，显示错误、警告、调试信息等）
+- 覆盖默认日志记录器中的时间戳（例如，使用 ISO8601 标准作为日期格式）
+- 完全覆盖默认日志记录器
+- 通过扩展它来自定义默认日志记录器
+- 利用依赖注入来简化应用程序的组合和测试
 
-You can also make use of the built-in logger, or create your own custom implementation, to log your own application-level events and messages.
+你还可以利用内置的日志记录器，或创建你自己的自定义实现，来记录你自己的应用程序级别的事件和消息。
 
-For more advanced logging functionality, you can make use of any Node.js logging package, such as [Winston](https://github.com/winstonjs/winston), to implement a completely custom, production grade logging system.
+对于更高级的日志记录功能，你可以使用任何 Node.js 日志记录包，例如 [Winston](https://github.com/winstonjs/winston)，来实现一个完全自定义的、生产级别的日志记录系统。
 
-#### Basic customization
+#### 基本自定义
 
-To disable logging, set the `logger` property to `false` in the (optional) Nest application options object passed as the second argument to the `NestFactory.create()` method.
+要禁用日志记录，将（可选的）Nest 应用程序选项对象中的 `logger` 属性设置为 `false`，该对象作为第二个参数传递给 `NestFactory.create()` 方法。
 
 ```typescript
 const app = await NestFactory.create(AppModule, {
@@ -24,7 +24,7 @@ const app = await NestFactory.create(AppModule, {
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-To enable specific logging levels, set the `logger` property to an array of strings specifying the log levels to display, as follows:
+要启用特定的日志级别，将 `logger` 属性设置为一个字符串数组，指定要显示的日志级别，如下所示：
 
 ```typescript
 const app = await NestFactory.create(AppModule, {
@@ -33,13 +33,13 @@ const app = await NestFactory.create(AppModule, {
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-Values in the array can be any combination of `'log'`, `'fatal'`, `'error'`, `'warn'`, `'debug'`, and `'verbose'`.
+数组中的值可以是 `'log'`、`'fatal'`、`'error'`、`'warn'`、`'debug'` 和 `'verbose'` 的任意组合。
 
-> info **Hint** To disable color in the default logger's messages, set the `NO_COLOR` environment variable to some non-empty string.
+> **提示**：要禁用默认日志记录器消息中的颜色，将 `NO_COLOR` 环境变量设置为某个非空字符串。
 
-#### Custom implementation
+#### 自定义实现
 
-You can provide a custom logger implementation to be used by Nest for system logging by setting the value of the `logger` property to an object that fulfills the `LoggerService` interface. For example, you can tell Nest to use the built-in global JavaScript `console` object (which implements the `LoggerService` interface), as follows:
+你可以通过将 `logger` 属性的值设置为一个实现 `LoggerService` 接口的对象，来提供 Nest 用于系统日志记录的自定义日志记录器实现。例如，你可以告诉 Nest 使用内置的全局 JavaScript `console` 对象（它实现了 `LoggerService` 接口），如下所示：
 
 ```typescript
 const app = await NestFactory.create(AppModule, {
@@ -48,7 +48,7 @@ const app = await NestFactory.create(AppModule, {
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-Implementing your own custom logger is straightforward. Simply implement each of the methods of the `LoggerService` interface as shown below.
+实现你自己的自定义日志记录器是直接的。简单地实现 `LoggerService` 接口的每个方法，如下所示。
 
 ```typescript
 import { LoggerService, Injectable } from '@nestjs/common';
@@ -56,38 +56,38 @@ import { LoggerService, Injectable } from '@nestjs/common';
 @Injectable()
 export class MyLogger implements LoggerService {
   /**
-   * Write a 'log' level log.
+   * 写入一个 'log' 级别的日志。
    */
   log(message: any, ...optionalParams: any[]) {}
 
   /**
-   * Write a 'fatal' level log.
+   * 写入一个 'fatal' 级别的日志。
    */
   fatal(message: any, ...optionalParams: any[]) {}
 
   /**
-   * Write an 'error' level log.
+   * 写入一个 'error' 级别的日志。
    */
   error(message: any, ...optionalParams: any[]) {}
 
   /**
-   * Write a 'warn' level log.
+   * 写入一个 'warn' 级别的日志。
    */
   warn(message: any, ...optionalParams: any[]) {}
 
   /**
-   * Write a 'debug' level log.
+   * 写入一个 'debug' 级别的日志。
    */
   debug?(message: any, ...optionalParams: any[]) {}
 
   /**
-   * Write a 'verbose' level log.
+   * 写入一个 'verbose' 级别的日志。
    */
   verbose?(message: any, ...optionalParams: any[]) {}
 }
 ```
 
-You can then supply an instance of `MyLogger` via the `logger` property of the Nest application options object.
+然后你可以通过 Nest 应用程序选项对象的 `logger` 属性提供一个 `MyLogger` 的实例。
 
 ```typescript
 const app = await NestFactory.create(AppModule, {
@@ -96,72 +96,38 @@ const app = await NestFactory.create(AppModule, {
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-This technique, while simple, doesn't utilize dependency injection for the `MyLogger` class. This can pose some challenges, particularly for testing, and limit the reusability of `MyLogger`. For a better solution, see the <a href="techniques/logger#dependency-injection">Dependency Injection</a> section below.
+这种技术虽然简单，但不利用依赖注入为 `MyLogger` 类。这可能会带来一些挑战，特别是在测试时，并限制了 `MyLogger` 的可重用性。有关更好的解决方案，请参见下面的<a href="techniques/logger#dependency-injection">依赖注入</a>部分。
 
-#### Extend built-in logger
+#### 扩展内置日志记录器
 
-Rather than writing a logger from scratch, you may be able to meet your needs by extending the built-in `ConsoleLogger` class and overriding selected behavior of the default implementation.
+而不是从头开始编写日志记录器，你可以通过扩展内置的 `ConsoleLogger` 类并覆盖默认实现的选定行为来满足你的需求。
 
 ```typescript
 import { ConsoleLogger } from '@nestjs/common';
 
 export class MyLogger extends ConsoleLogger {
   error(message: any, stack?: string, context?: string) {
-    // add your tailored logic here
+    // 在这里添加你定制的逻辑
     super.error(...arguments);
   }
 }
 ```
 
-You can use such an extended logger in your feature modules as described in the <a href="techniques/logger#using-the-logger-for-application-logging">Using the logger for application logging</a> section below.
+你可以如下面的<a href="techniques/logger#using-the-logger-for-application-logging">使用日志记录器进行应用程序日志记录</a>部分所述，在你的功能模块中使用这样的扩展日志记录器。
 
-You can tell Nest to use your extended logger for system logging by passing an instance of it via the `logger` property of the application options object (as shown in the <a href="techniques/logger#custom-logger-implementation">Custom implementation</a> section above), or by using the technique shown in the <a href="techniques/logger#dependency-injection">Dependency Injection</a> section below. If you do so, you should take care to call `super`, as shown in the sample code above, to delegate the specific log method call to the parent (built-in) class so that Nest can rely on the built-in features it expects.
+你可以通过传递一个实例通过应用程序选项对象的 `logger` 属性来告诉 Nest 使用你的扩展日志记录器进行系统日志记录（如上文<a href="techniques/logger#custom-logger-implementation">自定义实现</a>部分所示），或者使用<a href="techniques/logger#dependency-injection">依赖注入</a>部分所示的技术。如果你这样做，你应该小心调用 `super`，如上面的示例代码所示，以便将特定的日志方法调用委托给父类（内置）类，以便 Nest 可以依赖它期望的内置功能。
 
-<app-banner-courses></app-banner-courses>
+> **注意**：在上面的例子中，我们将 `bufferLogs` 设置为 `true` 以确保所有日志将被缓冲，直到附加自定义日志记录器（这种情况下是 `MyLogger`）并且应用程序初始化过程要么完成要么失败。如果初始化过程失败，Nest 将回退到原始的 `ConsoleLogger` 以打印出任何报告的错误消息。另外，你可以将 `autoFlushLogs` 设置为 `false`（默认 `true`）以手动刷新日志（使用 `Logger.flush()` 方法）。
 
-#### Dependency injection
+在这里我们使用 `NestApplication` 实例上的 `get()` 方法来检索 `MyLogger` 对象的单例实例。这种技术本质上是一种“注入”日志记录器实例以供 Nest 使用的方法。`app.get()` 调用检索 `MyLogger` 的单例实例，并依赖于该实例首先在另一个模块中被注入，如上所述。
 
-For more advanced logging functionality, you'll want to take advantage of dependency injection. For example, you may want to inject a `ConfigService` into your logger to customize it, and in turn inject your custom logger into other controllers and/or providers. To enable dependency injection for your custom logger, create a class that implements `LoggerService` and register that class as a provider in some module. For example, you can
+你也可以在你的功能类中注入这个 `MyLogger` 提供者，从而确保 Nest 系统日志记录和应用程序日志记录之间一致的日志行为。有关更多信息，请参见<a href="techniques/logger#using-the-logger-for-application-logging">使用日志记录器进行应用程序日志记录</a>和<a href="techniques/logger#injecting-a-custom-logger">注入自定义日志记录器</a>。
 
-1. Define a `MyLogger` class that either extends the built-in `ConsoleLogger` or completely overrides it, as shown in previous sections. Be sure to implement the `LoggerService` interface.
-2. Create a `LoggerModule` as shown below, and provide `MyLogger` from that module.
+#### 使用日志记录器进行应用程序日志记录
 
-```typescript
-import { Module } from '@nestjs/common';
-import { MyLogger } from './my-logger.service';
+我们可以结合上述几种技术，以提供 Nest 系统日志记录和我们自己的应用程序事件/消息日志记录之间一致的行为和格式。
 
-@Module({
-  providers: [MyLogger],
-  exports: [MyLogger],
-})
-export class LoggerModule {}
-```
-
-With this construct, you are now providing your custom logger for use by any other module. Because your `MyLogger` class is part of a module, it can use dependency injection (for example, to inject a `ConfigService`). There's one more technique needed to provide this custom logger for use by Nest for system logging (e.g., for bootstrapping and error handling).
-
-Because application instantiation (`NestFactory.create()`) happens outside the context of any module, it doesn't participate in the normal Dependency Injection phase of initialization. So we must ensure that at least one application module imports the `LoggerModule` to trigger Nest to instantiate a singleton instance of our `MyLogger` class.
-
-We can then instruct Nest to use the same singleton instance of `MyLogger` with the following construction:
-
-```typescript
-const app = await NestFactory.create(AppModule, {
-  bufferLogs: true,
-});
-app.useLogger(app.get(MyLogger));
-await app.listen(process.env.PORT ?? 3000);
-```
-
-> info **Note** In the example above, we set the `bufferLogs` to `true` to make sure all logs will be buffered until a custom logger is attached (`MyLogger` in this case) and the application initialisation process either completes or fails. If the initialisation process fails, Nest will fallback to the original `ConsoleLogger` to print out any reported error messages. Also, you can set the `autoFlushLogs` to `false` (default `true`) to manually flush logs (using the `Logger.flush()` method).
-
-Here we use the `get()` method on the `NestApplication` instance to retrieve the singleton instance of the `MyLogger` object. This technique is essentially a way to "inject" an instance of a logger for use by Nest. The `app.get()` call retrieves the singleton instance of `MyLogger`, and depends on that instance being first injected in another module, as described above.
-
-You can also inject this `MyLogger` provider in your feature classes, thus ensuring consistent logging behavior across both Nest system logging and application logging. See <a href="techniques/logger#using-the-logger-for-application-logging">Using the logger for application logging</a> and <a href="techniques/logger#injecting-a-custom-logger">Injecting a custom logger</a> below for more information.
-
-#### Using the logger for application logging
-
-We can combine several of the techniques above to provide consistent behavior and formatting across both Nest system logging and our own application event/message logging.
-
-A good practice is to instantiate `Logger` class from `@nestjs/common` in each of our services. We can supply our service name as the `context` argument in the `Logger` constructor, like so:
+一个好的做法是在每个服务中实例化 `@nestjs/common` 中的 `Logger` 类。我们可以在 `Logger` 构造函数中提供我们的服务名称作为 `context` 参数，如下所示：
 
 ```typescript
 import { Logger, Injectable } from '@nestjs/common';
@@ -171,26 +137,26 @@ class MyService {
   private readonly logger = new Logger(MyService.name);
 
   doSomething() {
-    this.logger.log('Doing something...');
+    this.logger.log('正在做某事...');
   }
 }
 ```
 
-In the default logger implementation, `context` is printed in the square brackets, like `NestFactory` in the example below:
+在默认的日志记录器实现中，`context` 被打印在方括号中，如下例中的 `NestFactory`：
 
 ```bash
-[Nest] 19096   - 12/08/2019, 7:12:59 AM   [NestFactory] Starting Nest application...
+[Nest] 19096   - 12/08/2019, 7:12:59 AM   [NestFactory] 正在启动 Nest 应用程序...
 ```
 
-If we supply a custom logger via `app.useLogger()`, it will actually be used by Nest internally. That means that our code remains implementation agnostic, while we can easily substitute the default logger for our custom one by calling `app.useLogger()`.
+如果我们通过 `app.useLogger()` 提供自定义日志记录器，它实际上将被 Nest 内部使用。这意味着我们的代码保持实现不可知，而我们可以很容易地通过调用 `app.useLogger()` 将默认日志记录器替换为我们的自定义一个。
 
-That way if we follow the steps from the previous section and call `app.useLogger(app.get(MyLogger))`, the following calls to `this.logger.log()` from `MyService` would result in calls to method `log` from `MyLogger` instance.
+通过这种方式，如果我们按照上一节的步骤并调用 `app.useLogger(app.get(MyLogger))`，从 `MyService` 调用 `this.logger.log()` 将导致调用 `MyLogger` 实例的 `log` 方法。
 
-This should be suitable for most cases. But if you need more customization (like adding and calling custom methods), move to the next section.
+这应该适用于大多数情况。但如果你需要更多的自定义（比如添加和调用自定义方法），请参见下一节。
 
-#### Logs with timestamps
+#### 带时间戳的日志
 
-To enable timestamp logging for every logged message, you can use the optional `timestamp: true` setting when creating the logger instance.
+要为每个记录的消息启用时间戳日志记录，你可以在创建日志记录器实例时使用可选的 `timestamp: true` 设置。
 
 ```typescript
 import { Logger, Injectable } from '@nestjs/common';
@@ -200,22 +166,22 @@ class MyService {
   private readonly logger = new Logger(MyService.name, { timestamp: true });
 
   doSomething() {
-    this.logger.log('Doing something with timestamp here ->');
+    this.logger.log('在这里做某事带时间戳 -\u003e');
   }
 }
 ```
 
-This will produce output in the following format:
+这将产生以下格式的输出：
 
 ```bash
-[Nest] 19096   - 04/19/2024, 7:12:59 AM   [MyService] Doing something with timestamp here +5ms
+[Nest] 19096   - 04/19/2024, 7:12:59 AM   [MyService] 正在做某事带时间戳 +5ms
 ```
 
-Note the `+5ms` at the end of the line. For each log statement, the time difference from the previous message is calculated and displayed at the end of the line.
+注意行尾的 `+5ms`。对于每个日志语句，计算与前一条消息的时间差，并在行尾显示。
 
-#### Injecting a custom logger
+#### 注入自定义日志记录器
 
-To start, extend the built-in logger with code like the following. We supply the `scope` option as configuration metadata for the `ConsoleLogger` class, specifying a [transient](/fundamentals/injection-scopes) scope, to ensure that we'll have a unique instance of the `MyLogger` in each feature module. In this example, we do not extend the individual `ConsoleLogger` methods (like `log()`, `warn()`, etc.), though you may choose to do so.
+首先，使用以下代码扩展内置日志记录器。我们为 `ConsoleLogger` 类提供 `scope` 选项作为配置元数据，指定一个[瞬态](/fundamentals/injection-scopes)范围，以确保我们在每个功能模块中有 `MyLogger` 的唯一实例。在这个例子中，我们没有扩展个别 `ConsoleLogger` 方法（如 `log()`、`warn()` 等），尽管你可以选择这样做。
 
 ```typescript
 import { Injectable, Scope, ConsoleLogger } from '@nestjs/common';
@@ -223,12 +189,12 @@ import { Injectable, Scope, ConsoleLogger } from '@nestjs/common';
 @Injectable({ scope: Scope.TRANSIENT })
 export class MyLogger extends ConsoleLogger {
   customLog() {
-    this.log('Please feed the cat!');
+    this.log('请喂猫！');
   }
 }
 ```
 
-Next, create a `LoggerModule` with a construction like this:
+接下来，创建一个 `LoggerModule` 如下所示，并从该模块提供 `MyLogger`。
 
 ```typescript
 import { Module } from '@nestjs/common';
@@ -241,7 +207,7 @@ import { MyLogger } from './my-logger.service';
 export class LoggerModule {}
 ```
 
-Next, import the `LoggerModule` into your feature module. Since we extended default `Logger` we have the convenience of using `setContext` method. So we can start using the context-aware custom logger, like this:
+接下来，将 `LoggerModule` 导入到你的功能模块中。由于我们扩展了默认的 `Logger`，我们有使用 `setContext` 方法的便利。因此，我们可以开始使用上下文感知的自定义日志记录器，如下所示：
 
 ```typescript
 import { Injectable } from '@nestjs/common';
@@ -252,22 +218,22 @@ export class CatsService {
   private readonly cats: Cat[] = [];
 
   constructor(private myLogger: MyLogger) {
-    // Due to transient scope, CatsService has its own unique instance of MyLogger,
-    // so setting context here will not affect other instances in other services
+    // 由于瞬态范围，CatsService 有自己的 MyLogger 唯一实例，
+    // 所以在这里设置上下文不会影响其他服务中的其他实例
     this.myLogger.setContext('CatsService');
   }
 
   findAll(): Cat[] {
-    // You can call all the default methods
-    this.myLogger.warn('About to return cats!');
-    // And your custom methods
+    // 你可以调用所有默认方法
+    this.myLogger.warn('即将返回猫！');
+    // 以及你的自定义方法
     this.myLogger.customLog();
     return this.cats;
   }
 }
 ```
 
-Finally, instruct Nest to use an instance of the custom logger in your `main.ts` file as shown below. Of course in this example, we haven't actually customized the logger behavior (by extending the `Logger` methods like `log()`, `warn()`, etc.), so this step isn't actually needed. But it **would** be needed if you added custom logic to those methods and wanted Nest to use the same implementation.
+最后，在 `main.ts` 文件中按照如下所示指示 Nest 使用自定义日志记录器的一个实例。当然在这个例子中，我们实际上并没有自定义日志记录器行为（通过扩展 `Logger` 方法如 `log()`、`warn()` 等），所以这一步实际上并不需要。但如果你在这些方法中添加了自定义逻辑并希望 Nest 使用相同的实现，那么这一步**将是必需的**。
 
 ```typescript
 const app = await NestFactory.create(AppModule, {
@@ -277,8 +243,8 @@ app.useLogger(new MyLogger());
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-> info **Hint** Alternatively, instead of setting `bufferLogs` to `true`, you could temporarily disable the logger with `logger: false` instruction. Be mindful that if you supply `logger: false` to `NestFactory.create`, nothing will be logged until you call `useLogger`, so you may miss some important initialization errors. If you don't mind that some of your initial messages will be logged with the default logger, you can just omit the `logger: false` option.
+> **提示**：或者，而不是将 `bufferLogs` 设置为 `true`，你可以暂时用 `logger: false` 指令禁用日志记录器。请注意，如果你向 `NestFactory.create` 提供 `logger: false`，直到你调用 `useLogger` 之前，将不会记录任何内容，所以你可能会错过一些重要的初始化错误。如果你不介意你的一些初始消息将用默认日志记录器记录，你可以简单地省略 `logger: false` 选项。
 
-#### Use external logger
+#### 使用外部日志记录器
 
-Production applications often have specific logging requirements, including advanced filtering, formatting and centralized logging. Nest's built-in logger is used for monitoring Nest system behavior, and can also be useful for basic formatted text logging in your feature modules while in development, but production applications often take advantage of dedicated logging modules like [Winston](https://github.com/winstonjs/winston). As with any standard Node.js application, you can take full advantage of such modules in Nest.
+生产应用程序通常具有特定的日志记录要求，包括高级过滤、格式化和集中日志记录。Nest 的内置日志记录器用于监视 Nest 系统行为，也可以在开发期间用于功能模块中的基本格式化文本日志记录，但生产应用程序通常利用专门的日志记录模块，如 [Winston](https://github.com/winstonjs/winston)。与任何标准 Node.js 应用程序一样，你可以在 Nest 中充分利用此类模块。

@@ -1,25 +1,25 @@
-### Exception filters
+### 异常过滤器
 
-The only difference between the HTTP [exception filter](/exception-filters) layer and the corresponding microservices layer is that instead of throwing `HttpException`, you should use `RpcException`.
+HTTP [异常过滤器](/exception-filters)层与相应的微服务层之间的唯一区别在于，不应抛出`HttpException`，而应使用`RpcException`。
 
 ```typescript
-throw new RpcException('Invalid credentials.');
+throw new RpcException('无效的凭证。');
 ```
 
-> info **Hint** The `RpcException` class is imported from the `@nestjs/microservices` package.
+> 信息 **提示** `RpcException`类是从`@nestjs/microservices`包中导入的。
 
-With the sample above, Nest will handle the thrown exception and return the `error` object with the following structure:
+以上示例中，Nest将处理抛出的异常，并返回具有以下结构的`error`对象：
 
 ```json
 {
   "status": "error",
-  "message": "Invalid credentials."
+  "message": "无效的凭证。"
 }
 ```
 
-#### Filters
+#### 过滤器
 
-Microservice exception filters behave similarly to HTTP exception filters, with one small difference. The `catch()` method must return an `Observable`.
+微服务异常过滤器的行为与HTTP异常过滤器类似，有一个小区别。`catch()`方法必须返回一个`Observable`。
 
 ```typescript
 @@filename(rpc-exception.filter)
@@ -45,9 +45,9 @@ export class ExceptionFilter {
 }
 ```
 
-> warning **Warning** Global microservice exception filters aren't enabled by default when using a [hybrid application](/faq/hybrid-application).
+> 警告 **警告** 当使用[混合应用程序](/faq/hybrid-application)时，默认情况下不会启用全局微服务异常过滤器。
 
-The following example uses a manually instantiated method-scoped filter. Just as with HTTP based applications, you can also use controller-scoped filters (i.e., prefix the controller class with a `@UseFilters()` decorator).
+以下示例使用手动实例化的方法范围过滤器。就像基于HTTP的应用程序一样，您也可以使用控制器范围的过滤器（即，用`@UseFilters()`装饰器前缀控制器类）。
 
 ```typescript
 @@filename()
@@ -64,11 +64,11 @@ accumulate(data) {
 }
 ```
 
-#### Inheritance
+#### 继承
 
-Typically, you'll create fully customized exception filters crafted to fulfill your application requirements. However, there might be use-cases when you would like to simply extend the **core exception filter**, and override the behavior based on certain factors.
+通常，您会创建完全定制化的异常过滤器，以满足您的应用程序需求。然而，可能存在某些情况，您希望简单地扩展**核心异常过滤器**，并根据某些因素覆盖行为。
 
-In order to delegate exception processing to the base filter, you need to extend `BaseExceptionFilter` and call the inherited `catch()` method.
+为了将异常处理委托给基底过滤器，您需要扩展`BaseExceptionFilter`并调用继承的`catch()`方法。
 
 ```typescript
 @@filename()
@@ -93,4 +93,4 @@ export class AllExceptionsFilter extends BaseRpcExceptionFilter {
 }
 ```
 
-The above implementation is just a shell demonstrating the approach. Your implementation of the extended exception filter would include your tailored **business logic** (e.g., handling various conditions).
+上述实现只是一个展示方法的示例。您扩展的异常过滤器的实现将包括您定制的**业务逻辑**（例如，处理各种条件）。

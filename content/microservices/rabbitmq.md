@@ -1,18 +1,18 @@
 ### RabbitMQ
 
-[RabbitMQ](https://www.rabbitmq.com/) is an open-source and lightweight message broker which supports multiple messaging protocols. It can be deployed in distributed and federated configurations to meet high-scale, high-availability requirements. In addition, it's the most widely deployed message broker, used worldwide at small startups and large enterprises.
+[RabbitMQ](https://www.rabbitmq.com/) 是一个开源且轻量级的消息代理，支持多种消息协议。它可以在分布式和联合配置中部署，以满足高规模、高可用性的需求。此外，它还是全球部署最广泛的消息代理，从小型企业到大型企业都在使用。
 
-#### Installation
+#### 安装
 
-To start building RabbitMQ-based microservices, first install the required packages:
+要开始构建基于 RabbitMQ 的微服务，首先安装所需的包：
 
 ```bash
 $ npm i --save amqplib amqp-connection-manager
 ```
 
-#### Overview
+#### 概览
 
-To use the RabbitMQ transporter, pass the following options object to the `createMicroservice()` method:
+要使用 RabbitMQ 传输器，请将以下选项对象传递给 `createMicroservice()` 方法：
 
 ```typescript
 @@filename(main)
@@ -39,56 +39,56 @@ const app = await NestFactory.createMicroservice(AppModule, {
 });
 ```
 
-> info **Hint** The `Transport` enum is imported from the `@nestjs/microservices` package.
+> 信息 **提示** `Transport` 枚举是从 `@nestjs/microservices` 包中导入的。
 
-#### Options
+#### 选项
 
-The `options` property is specific to the chosen transporter. The <strong>RabbitMQ</strong> transporter exposes the properties described below.
+`options` 属性是特定于所选传输器的。`RabbitMQ` 传输器暴露了以下属性。
 
 <table>
   <tr>
     <td><code>urls</code></td>
-    <td>Connection urls</td>
+    <td>连接 URL</td>
   </tr>
   <tr>
     <td><code>queue</code></td>
-    <td>Queue name which your server will listen to</td>
+    <td>服务器将监听的队列名称</td>
   </tr>
   <tr>
     <td><code>prefetchCount</code></td>
-    <td>Sets the prefetch count for the channel</td>
+    <td>设置通道的预取计数</td>
   </tr>
   <tr>
     <td><code>isGlobalPrefetchCount</code></td>
-    <td>Enables per channel prefetching</td>
+    <td>启用每个通道的预取</td>
   </tr>
   <tr>
     <td><code>noAck</code></td>
-    <td>If <code>false</code>, manual acknowledgment mode enabled</td>
+    <td>如果为 <code>false</code>，则启用手动确认模式</td>
   </tr>
   <tr>
     <td><code>consumerTag</code></td>
-    <td>Consumer Tag Identifier (read more <a href="https://amqp-node.github.io/amqplib/channel_api.html#channel_consume" rel="nofollow" target="_blank">here</a>)</td>
+    <td>消费者标签标识符（更多信息请 <a href="https://amqp-node.github.io/amqplib/channel_api.html#channel_consume" rel="nofollow" target="_blank">点击这里</a>）</td>
   </tr>
   <tr>
     <td><code>queueOptions</code></td>
-    <td>Additional queue options (read more <a href="https://amqp-node.github.io/amqplib/channel_api.html#channel_assertQueue" rel="nofollow" target="_blank">here</a>)</td>
+    <td>额外的队列选项（更多信息请 <a href="https://amqp-node.github.io/amqplib/channel_api.html#channel_assertQueue" rel="nofollow" target="_blank">点击这里</a>）</td>
   </tr>
   <tr>
     <td><code>socketOptions</code></td>
-    <td>Additional socket options (read more <a href="https://amqp-node.github.io/amqplib/channel_api.html#connect" rel="nofollow" target="_blank">here</a>)</td>
+    <td>额外的套接字选项（更多信息请 <a href="https://amqp-node.github.io/amqplib/channel_api.html#connect" rel="nofollow" target="_blank">点击这里</a>）</td>
   </tr>
   <tr>
     <td><code>headers</code></td>
-    <td>Headers to be sent along with every message</td>
+    <td>随每条消息一起发送的头部</td>
   </tr>
 </table>
 
-#### Client
+#### 客户端
 
-Like other microservice transporters, you have <a href="https://docs.nestjs.com/microservices/basics#client">several options</a> for creating a RabbitMQ `ClientProxy` instance.
+像其他微服务传输器一样，您有 <a href="https://docs.nestjs.com/microservices/basics#client">几种选项</a> 来创建 RabbitMQ `ClientProxy` 实例。
 
-One method for creating an instance is to use the `ClientsModule`. To create a client instance with the `ClientsModule`, import it and use the `register()` method to pass an options object with the same properties shown above in the `createMicroservice()` method, as well as a `name` property to be used as the injection token. Read more about `ClientsModule` <a href="https://docs.nestjs.com/microservices/basics#client">here</a>.
+使用 `ClientsModule` 创建客户端实例的一种方法是导入它并使用 `register()` 方法传递一个选项对象，该对象具有与 `createMicroservice()` 方法中显示的相同属性，以及一个 `name` 属性，用作注入令牌。更多关于 `ClientsModule` 的信息，请 <a href="https://docs.nestjs.com/microservices/basics#client">点击这里</a>。
 
 ```typescript
 @Module({
@@ -111,11 +111,11 @@ One method for creating an instance is to use the `ClientsModule`. To create a c
 })
 ```
 
-Other options to create a client (either `ClientProxyFactory` or `@Client()`) can be used as well. You can read about them <a href="https://docs.nestjs.com/microservices/basics#client">here</a>.
+也可以使用其他选项创建客户端（无论是 `ClientProxyFactory` 还是 `@Client()`）。您可以在 <a href="https://docs.nestjs.com/microservices/basics#client">这里</a> 阅读有关它们的更多信息。
 
-#### Context
+#### 上下文
 
-In more sophisticated scenarios, you may want to access more information about the incoming request. When using the RabbitMQ transporter, you can access the `RmqContext` object.
+在更复杂的场景中，您可能想要访问有关传入请求的更多信息。当使用 RabbitMQ 传输器时，您可以访问 `RmqContext` 对象。
 
 ```typescript
 @@filename()
@@ -131,9 +131,9 @@ getNotifications(data, context) {
 }
 ```
 
-> info **Hint** `@Payload()`, `@Ctx()` and `RmqContext` are imported from the `@nestjs/microservices` package.
+> 信息 **提示** `@Payload()`, `@Ctx()` 和 `RmqContext` 是从 `@nestjs/microservices` 包中导入的。
 
-To access the original RabbitMQ message (with the `properties`, `fields`, and `content`), use the `getMessage()` method of the `RmqContext` object, as follows:
+要访问原始的 RabbitMQ 消息（带有 `properties`, `fields` 和 `content`），请使用 `RmqContext` 对象的 `getMessage()` 方法，如下所示：
 
 ```typescript
 @@filename()
@@ -149,7 +149,7 @@ getNotifications(data, context) {
 }
 ```
 
-To retrieve a reference to the RabbitMQ [channel](https://www.rabbitmq.com/channels.html), use the `getChannelRef` method of the `RmqContext` object, as follows:
+要检索 RabbitMQ [通道](https://www.rabbitmq.com/channels.html) 的引用，请使用 `RmqContext` 对象的 `getChannelRef` 方法，如下所示：
 
 ```typescript
 @@filename()
@@ -165,11 +165,11 @@ getNotifications(data, context) {
 }
 ```
 
-#### Message acknowledgement
+#### 消息确认
 
-To make sure a message is never lost, RabbitMQ supports [message acknowledgements](https://www.rabbitmq.com/confirms.html). An acknowledgement is sent back by the consumer to tell RabbitMQ that a particular message has been received, processed and that RabbitMQ is free to delete it. If a consumer dies (its channel is closed, connection is closed, or TCP connection is lost) without sending an ack, RabbitMQ will understand that a message wasn't processed fully and will re-queue it.
+为确保消息永远不会丢失，RabbitMQ 支持 [消息确认](https://www.rabbitmq.com/confirms.html)。确认是由消费者发送回 RabbitMQ 的，以告知特定消息已被接收、处理，并且 RabbitMQ 可以自由删除它。如果消费者死亡（其通道关闭、连接关闭或 TCP 连接丢失）而没有发送确认，RabbitMQ 将理解消息没有被完全处理，并将重新入队。
 
-To enable manual acknowledgment mode, set the `noAck` property to `false`:
+要启用手动确认模式，请将 `noAck` 属性设置为 `false`：
 
 ```typescript
 options: {
@@ -182,7 +182,7 @@ options: {
 },
 ```
 
-When manual consumer acknowledgements are turned on, we must send a proper acknowledgement from the worker to signal that we are done with a task.
+当手动消费者确认打开时，我们必须从工作器发送适当的确认，以表示我们已经完成了任务。
 
 ```typescript
 @@filename()
@@ -204,9 +204,9 @@ getNotifications(data, context) {
 }
 ```
 
-#### Record builders
+#### 记录构建器
 
-To configure message options, you can use the `RmqRecordBuilder` class (note: this is doable for event-based flows as well). For example, to set `headers` and `priority` properties, use the `setOptions` method, as follows:
+要配置消息选项，您可以使用 `RmqRecordBuilder` 类（注意：这对于基于事件的流程也是可行的）。例如，要设置 `headers` 和 `priority` 属性，请使用 `setOptions` 方法，如下所示：
 
 ```typescript
 const message = ':cat:';
@@ -222,9 +222,9 @@ const record = new RmqRecordBuilder(message)
 this.client.send('replace-emoji', record).subscribe(...);
 ```
 
-> info **Hint** `RmqRecordBuilder` class is exported from the `@nestjs/microservices` package.
+> 信息 **提示** `RmqRecordBuilder` 类是从 `@nestjs/microservices` 包中导出的。
 
-And you can read these values on the server-side as well, by accessing the `RmqContext`, as follows:
+您也可以在服务器端通过访问 `RmqContext` 来读取这些值，如下所示：
 
 ```typescript
 @@filename()

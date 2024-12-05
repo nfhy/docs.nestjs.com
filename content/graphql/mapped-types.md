@@ -1,16 +1,15 @@
-### Mapped types
+### 映射类型
 
-> warning **Warning** This chapter applies only to the code first approach.
+> 警告 **警告** 本章节仅适用于代码优先方法。
 
-As you build out features like CRUD (Create/Read/Update/Delete) it's often useful to construct variants on a base entity type. Nest provides several utility functions that perform type transformations to make this task more convenient.
+在构建 CRUD（创建/读取/更新/删除）等功能时，通常需要基于基本实体类型构建变体。Nest 提供了几个实用函数，执行类型转换以使这项任务更加方便。
 
-#### Partial
+#### 部分
+在构建输入验证类型（也称为数据传输对象或 DTO）时，通常需要构建相同类型的**创建**和**更新**变体。例如，**创建**变体可能需要所有字段，而**更新**变体可能使所有字段可选。
 
-When building input validation types (also called Data Transfer Objects or DTOs), it's often useful to build **create** and **update** variations on the same type. For example, the **create** variant may require all fields, while the **update** variant may make all fields optional.
+Nest 提供了 `PartialType()` 实用函数，使这项任务更简单，减少样板代码。
 
-Nest provides the `PartialType()` utility function to make this task easier and minimize boilerplate.
-
-The `PartialType()` function returns a type (class) with all the properties of the input type set to optional. For example, suppose we have a **create** type as follows:
+`PartialType()` 函数返回一个类型（类），将输入类型的所有属性设置为可选。例如，假设我们有一个**创建**类型如下：
 
 ```typescript
 @InputType()
@@ -26,25 +25,24 @@ class CreateUserInput {
 }
 ```
 
-By default, all of these fields are required. To create a type with the same fields, but with each one optional, use `PartialType()` passing the class reference (`CreateUserInput`) as an argument:
+默认情况下，所有这些字段都是必需的。要创建一个具有相同字段但每个字段都是可选的类型，使用 `PartialType()` 传递类引用（`CreateUserInput`）作为参数：
 
 ```typescript
 @InputType()
 export class UpdateUserInput extends PartialType(CreateUserInput) {}
 ```
 
-> info **Hint** The `PartialType()` function is imported from the `@nestjs/graphql` package.
+> 提示 **提示** `PartialType()` 函数从 `@nestjs/graphql` 包导入。
 
-The `PartialType()` function takes an optional second argument that is a reference to a decorator factory. This argument can be used to change the decorator function applied to the resulting (child) class. If not specified, the child class effectively uses the same decorator as the **parent** class (the class referenced in the first argument). In the example above, we are extending `CreateUserInput` which is annotated with the `@InputType()` decorator. Since we want `UpdateUserInput` to also be treated as if it were decorated with `@InputType()`, we didn't need to pass `InputType` as the second argument. If the parent and child types are different, (e.g., the parent is decorated with `@ObjectType`), we would pass `InputType` as the second argument. For example:
+`PartialType()` 函数接受一个可选的第二个参数，这是一个装饰器工厂的引用。这个参数可以用来改变应用于结果（子）类的装饰器函数。如果没有指定，子类实际上使用与**父**类（第一个参数引用的类）相同的装饰器。在上面的例子中，我们扩展了用 `@InputType()` 装饰器注解的 `CreateUserInput`。由于我们希望 `UpdateUserInput` 也被视为用 `@InputType()` 装饰，我们不需要传递 `InputType` 作为第二个参数。如果父类和子类类型不同（例如，父类用 `@ObjectType` 装饰），我们会传递 `InputType` 作为第二个参数。例如：
 
 ```typescript
 @InputType()
 export class UpdateUserInput extends PartialType(User, InputType) {}
 ```
 
-#### Pick
-
-The `PickType()` function constructs a new type (class) by picking a set of properties from an input type. For example, suppose we start with a type like:
+#### 选择
+`PickType()` 函数通过从输入类型中选择一组属性来构建新类型（类）。例如，假设我们从以下类型开始：
 
 ```typescript
 @InputType()
@@ -60,7 +58,7 @@ class CreateUserInput {
 }
 ```
 
-We can pick a set of properties from this class using the `PickType()` utility function:
+我们可以使用 `PickType()` 实用函数从这个类中选择一组属性：
 
 ```typescript
 @InputType()
@@ -69,11 +67,10 @@ export class UpdateEmailInput extends PickType(CreateUserInput, [
 ] as const) {}
 ```
 
-> info **Hint** The `PickType()` function is imported from the `@nestjs/graphql` package.
+> 提示 **提示** `PickType()` 函数从 `@nestjs/graphql` 包导入。
 
-#### Omit
-
-The `OmitType()` function constructs a type by picking all properties from an input type and then removing a particular set of keys. For example, suppose we start with a type like:
+#### 省略
+`OmitType()` 函数通过从输入类型中选择所有属性，然后移除特定一组键来构建类型。例如，假设我们从以下类型开始：
 
 ```typescript
 @InputType()
@@ -89,7 +86,7 @@ class CreateUserInput {
 }
 ```
 
-We can generate a derived type that has every property **except** `email` as shown below. In this construct, the second argument to `OmitType` is an array of property names.
+我们可以生成一个派生类型，它具有除 `email` 之外的所有属性，如下所示。在这个构造中，`OmitType` 的第二个参数是一个属性名数组。
 
 ```typescript
 @InputType()
@@ -98,11 +95,10 @@ export class UpdateUserInput extends OmitType(CreateUserInput, [
 ] as const) {}
 ```
 
-> info **Hint** The `OmitType()` function is imported from the `@nestjs/graphql` package.
+> 提示 **提示** `OmitType()` 函数从 `@nestjs/graphql` 包导入。
 
-#### Intersection
-
-The `IntersectionType()` function combines two types into one new type (class). For example, suppose we start with two types like:
+#### 交集
+`IntersectionType()` 函数将两个类型合并为一个新类型（类）。例如，假设我们从两个类型开始：
 
 ```typescript
 @InputType()
@@ -124,7 +120,7 @@ export class AdditionalUserInfo {
 }
 ```
 
-We can generate a new type that combines all properties in both types.
+我们可以生成一个新类型，它结合了两种类型的所有属性。
 
 ```typescript
 @InputType()
@@ -134,11 +130,10 @@ export class UpdateUserInput extends IntersectionType(
 ) {}
 ```
 
-> info **Hint** The `IntersectionType()` function is imported from the `@nestjs/graphql` package.
+> 提示 **提示** `IntersectionType()` 函数从 `@nestjs/graphql` 包导入。
 
-#### Composition
-
-The type mapping utility functions are composable. For example, the following will produce a type (class) that has all of the properties of the `CreateUserInput` type except for `email`, and those properties will be set to optional:
+#### 组合
+类型映射实用函数是可组合的。例如，以下将产生一个类型（类），它具有 `CreateUserInput` 类型的所有属性，除了 `email`，并且这些属性将被设置为可选：
 
 ```typescript
 @InputType()

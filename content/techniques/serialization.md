@@ -1,16 +1,16 @@
-### Serialization
+### 序列化
 
-Serialization is a process that happens before objects are returned in a network response. This is an appropriate place to provide rules for transforming and sanitizing the data to be returned to the client. For example, sensitive data like passwords should always be excluded from the response. Or, certain properties might require additional transformation, such as sending only a subset of properties of an entity. Performing these transformations manually can be tedious and error prone, and can leave you uncertain that all cases have been covered.
+序列化是在对象返回网络响应之前发生的过程。这是提供转换和清理要返回给客户端的数据的规则的合适地方。例如，密码等敏感数据应该始终从响应中排除。或者，某些属性可能需要额外的转换，例如只发送实体的子集属性。手动执行这些转换可能会很繁琐且容易出错，并且可能会让你不确定是否已经覆盖了所有情况。
 
-#### Overview
+#### 概览
 
-Nest provides a built-in capability to help ensure that these operations can be performed in a straightforward way. The `ClassSerializerInterceptor` interceptor uses the powerful [class-transformer](https://github.com/typestack/class-transformer) package to provide a declarative and extensible way of transforming objects. The basic operation it performs is to take the value returned by a method handler and apply the `instanceToPlain()` function from [class-transformer](https://github.com/typestack/class-transformer). In doing so, it can apply rules expressed by `class-transformer` decorators on an entity/DTO class, as described below.
+Nest 提供了内置功能，以帮助确保这些操作可以以直接的方式执行。`ClassSerializerInterceptor` 拦截器使用功能强大的 [class-transformer](https://github.com/typestack/class-transformer) 包来提供一种声明式和可扩展的方式来转换对象。它执行的基本操作是取方法处理器返回的值，并应用 [class-transformer](https://github.com/typestack/class-transformer) 中的 `instanceToPlain()` 函数。这样做，它可以应用在实体/DTO类上用 `class-transformer` 装饰器表达的规则，如下所述。
 
-> info **Hint** The serialization does not apply to [StreamableFile](https://docs.nestjs.com/techniques/streaming-files#streamable-file-class) responses.
+> 信息提示：序列化不适用于 [StreamableFile](https://docs.nestjs.com/techniques/streaming-files#streamable-file-class) 响应。
 
-#### Exclude properties
+#### 排除属性
 
-Let's assume that we want to automatically exclude a `password` property from a user entity. We annotate the entity as follows:
+假设我们想要自动从用户实体中排除 `password` 属性。我们如下注解实体：
 
 ```typescript
 import { Exclude } from 'class-transformer';
@@ -29,7 +29,7 @@ export class UserEntity {
 }
 ```
 
-Now consider a controller with a method handler that returns an instance of this class.
+现在考虑一个控制器，其中的方法处理器返回这个类的实例。
 
 ```typescript
 @UseInterceptors(ClassSerializerInterceptor)
@@ -44,11 +44,11 @@ findOne(): UserEntity {
 }
 ```
 
-> **Warning** Note that we must return an instance of the class. If you return a plain JavaScript object, for example, `{{ '{' }} user: new UserEntity() {{ '}' }}`, the object won't be properly serialized.
+> 警告：请注意，我们必须返回类的实例。如果你返回一个纯 JavaScript 对象，例如 `{ user: new UserEntity() }`，对象将不会被正确序列化。
 
-> info **Hint** The `ClassSerializerInterceptor` is imported from `@nestjs/common`.
+> 信息提示：`ClassSerializerInterceptor` 从 `@nestjs/common` 导入。
 
-When this endpoint is requested, the client receives the following response:
+当这个端点被请求时，客户端收到以下响应：
 
 ```json
 {
@@ -58,11 +58,11 @@ When this endpoint is requested, the client receives the following response:
 }
 ```
 
-Note that the interceptor can be applied application-wide (as covered [here](https://docs.nestjs.com/interceptors#binding-interceptors)). The combination of the interceptor and the entity class declaration ensures that **any** method that returns a `UserEntity` will be sure to remove the `password` property. This gives you a measure of centralized enforcement of this business rule.
+请注意，拦截器可以应用到整个应用程序（如[这里](https://docs.nestjs.com/interceptors#binding-interceptors)所述）。拦截器和实体类声明的组合确保了 **任何** 返回 `UserEntity` 的方法都会确保移除 `password` 属性。这为你提供了一种集中执行此业务规则的措施。
 
-#### Expose properties
+#### 暴露属性
 
-You can use the `@Expose()` decorator to provide alias names for properties, or to execute a function to calculate a property value (analogous to **getter** functions), as shown below.
+你可以使用 `@Expose()` 装饰器为属性提供别名，或者执行一个函数来计算属性值（类似于 **getter** 函数），如下所示。
 
 ```typescript
 @Expose()
@@ -71,18 +71,18 @@ get fullName(): string {
 }
 ```
 
-#### Transform
+#### 转换
 
-You can perform additional data transformation using the `@Transform()` decorator. For example, the following construct returns the name property of the `RoleEntity` instead of returning the whole object.
+你可以使用 `@Transform()` 装饰器执行额外的数据转换。例如，以下结构返回 `RoleEntity` 的名称属性而不是返回整个对象。
 
 ```typescript
 @Transform(({ value }) => value.name)
 role: RoleEntity;
 ```
 
-#### Pass options
+#### 传递选项
 
-You may want to modify the default behavior of the transformation functions. To override default settings, pass them in an `options` object with the `@SerializeOptions()` decorator.
+你可能想要修改转换函数的默认行为。要覆盖默认设置，请在 `options` 对象中传递它们，并使用 `@SerializeOptions()` 装饰器。
 
 ```typescript
 @SerializeOptions({
@@ -94,15 +94,15 @@ findOne(): UserEntity {
 }
 ```
 
-> info **Hint** The `@SerializeOptions()` decorator is imported from `@nestjs/common`.
+> 信息提示：`@SerializeOptions()` 装饰器从 `@nestjs/common` 导入。
 
-Options passed via `@SerializeOptions()` are passed as the second argument of the underlying `instanceToPlain()` function. In this example, we are automatically excluding all properties that begin with the `_` prefix.
+通过 `@SerializeOptions()` 传递的选项作为第二个参数传递给底层的 `instanceToPlain()` 函数。在这个例子中，我们自动排除所有以 `_` 前缀开头的属性。
 
-#### Transform plain objects
+#### 转换纯对象
 
-You can enforce transformations at the controller level by using the `@SerializeOptions` decorator. This ensures that all responses are transformed into instances of the specified class, applying any decorators from class-validator or class-transformer, even when plain objects are returned. This approach leads to cleaner code without the need to repeatedly instantiate the class or call `plainToInstance`.
+你可以通过在控制器级别使用 `@SerializeOptions` 装饰器来强制执行转换。这确保了所有响应都被转换为指定类的实例，应用了来自 class-validator 或 class-transformer 的任何装饰器，即使返回的是纯对象。这种方法导致代码更干净，无需重复实例化类或调用 `plainToInstance`。
 
-In the example below, despite returning plain JavaScript objects in both conditional branches, they will be automatically converted into `UserEntity` instances, with the relevant decorators applied:
+在下面的示例中，尽管在两个条件分支中都返回了纯 JavaScript 对象，但它们将自动转换为 `UserEntity` 实例，并应用相关的装饰器：
 
 ```typescript
 @UseInterceptors(ClassSerializerInterceptor)
@@ -127,16 +127,16 @@ findOne(@Query() { id }: { id: number }): UserEntity {
 }
 ```
 
-> info **Hint** By specifying the expected return type for the controller, you can leverage TypeScript's type-checking capabilities to ensure that the returned plain object adheres to the shape of the DTO or entity. The `plainToInstance` function doesn't provide this level of type hinting, which can lead to potential bugs if the plain object doesn't match the expected DTO or entity structure.
+> 信息提示：通过指定控制器的预期返回类型，你可以利用 TypeScript 的类型检查功能，确保返回的纯对象符合 DTO 或实体的形状。`plainToInstance` 函数不提供这种类型的提示，如果纯对象与预期的 DTO 或实体结构不匹配，可能会导致潜在的错误。
 
-#### Example
+#### 示例
 
-A working example is available [here](https://github.com/nestjs/nest/tree/master/sample/21-serializer).
+一个工作示例可在 [这里](https://github.com/nestjs/nest/tree/master/sample/21-serializer) 找到。
 
-#### WebSockets and Microservices
+#### WebSockets 和微服务
 
-While this chapter shows examples using HTTP style applications (e.g., Express or Fastify), the `ClassSerializerInterceptor` works the same for WebSockets and Microservices, regardless of the transport method that is used.
+虽然本章展示了使用 HTTP 风格应用程序（例如，Express 或 Fastify）的示例，`ClassSerializerInterceptor` 对于 WebSockets 和微服务的工作方式相同，无论使用哪种传输方法。
 
-#### Learn more
+#### 了解更多
 
-Read more about available decorators and options as provided by the `class-transformer` package [here](https://github.com/typestack/class-transformer).
+了解更多由 `class-transformer` 包提供的装饰器和选项，请访问 [这里](https://github.com/typestack/class-transformer)。

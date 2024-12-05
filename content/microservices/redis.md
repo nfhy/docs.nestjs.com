@@ -1,20 +1,20 @@
 ### Redis
 
-The [Redis](https://redis.io/) transporter implements the publish/subscribe messaging paradigm and leverages the [Pub/Sub](https://redis.io/topics/pubsub) feature of Redis. Published messages are categorized in channels, without knowing what subscribers (if any) will eventually receive the message. Each microservice can subscribe to any number of channels. In addition, more than one channel can be subscribed to at a time. Messages exchanged through channels are **fire-and-forget**, which means that if a message is published and there are no subscribers interested in it, the message is removed and cannot be recovered. Thus, you don't have a guarantee that either messages or events will be handled by at least one service. A single message can be subscribed to (and received) by multiple subscribers.
+Redis 传输器实现了发布/订阅消息范式，并利用了 Redis 的 [Pub/Sub](https://redis.io/topics/pubsub) 特性。发布的消息被分类到频道中，发布者不知道最终会有哪些订阅者（如果有的话）接收到消息。每个微服务可以订阅任意数量的频道。此外，可以同时订阅多个频道。通过频道交换的消息是**即发即弃**的，这意味着如果一个消息被发布而没有订阅者对此感兴趣，消息将被移除且无法恢复。因此，你不能保证消息或事件至少会被一个服务处理。单个消息可以被多个订阅者订阅（和接收）。
 
 <figure><img class="illustrative-image" src="/assets/Redis_1.png" /></figure>
 
-#### Installation
+#### 安装
 
-To start building Redis-based microservices, first install the required package:
+要开始构建基于 Redis 的微服务，首先安装所需的包：
 
 ```bash
 $ npm i --save ioredis
 ```
 
-#### Overview
+#### 概览
 
-To use the Redis transporter, pass the following options object to the `createMicroservice()` method:
+要使用 Redis 传输器，将以下选项对象传递给 `createMicroservice()` 方法：
 
 ```typescript
 @@filename(main)
@@ -35,42 +35,42 @@ const app = await NestFactory.createMicroservice(AppModule, {
 });
 ```
 
-> info **Hint** The `Transport` enum is imported from the `@nestjs/microservices` package.
+> 信息提示 **提示** `Transport` 枚举是从 `@nestjs/microservices` 包导入的。
 
-#### Options
+#### 选项
 
-The `options` property is specific to the chosen transporter. The <strong>Redis</strong> transporter exposes the properties described below.
+`options` 属性是特定于所选传输器的。Redis 传输器暴露了以下描述的属性。
 
 <table>
   <tr>
     <td><code>host</code></td>
-    <td>Connection url</td>
+    <td>连接 URL</td>
   </tr>
   <tr>
     <td><code>port</code></td>
-    <td>Connection port</td>
+    <td>连接端口</td>
   </tr>
   <tr>
     <td><code>retryAttempts</code></td>
-    <td>Number of times to retry message (default: <code>0</code>)</td>
+    <td>消息重试次数（默认：<code>0</code>）</td>
   </tr>
   <tr>
     <td><code>retryDelay</code></td>
-    <td>Delay between message retry attempts (ms) (default: <code>0</code>)</td>
+    <td>消息重试尝试之间的延迟（毫秒）（默认：<code>0</code>）</td>
   </tr>
-   <tr>
+  <tr>
     <td><code>wildcards</code></td>
-    <td>Enables Redis wildcard subscriptions, instructing transporter to use <code>psubscribe</code>/<code>pmessage</code> under the hood. (default: <code>false</code>)</td>
+    <td>启用 Redis 通配符订阅，指示传输器在底层使用 <code>psubscribe</code>/<code>pmessage</code>。（默认：<code>false</code>）</td>
   </tr>
 </table>
 
-All the properties supported by the official [ioredis](https://redis.github.io/ioredis/index.html#RedisOptions) client are also supported by this transporter.
+官方 [ioredis](https://redis.github.io/ioredis/index.html#RedisOptions) 客户端支持的所有属性也由这个传输器支持。
 
-#### Client
+#### 客户端
 
-Like other microservice transporters, you have <a href="https://docs.nestjs.com/microservices/basics#client">several options</a> for creating a Redis `ClientProxy` instance.
+像其他微服务传输器一样，你有[多种选项](https://docs.nestjs.com/microservices/basics#client)来创建 Redis `ClientProxy` 实例。
 
-One method for creating an instance is to use the `ClientsModule`. To create a client instance with the `ClientsModule`, import it and use the `register()` method to pass an options object with the same properties shown above in the `createMicroservice()` method, as well as a `name` property to be used as the injection token. Read more about `ClientsModule` <a href="https://docs.nestjs.com/microservices/basics#client">here</a>.
+创建客户端实例的一种方法是使用 `ClientsModule`。要使用 `ClientsModule` 创建客户端实例，导入它并使用 `register()` 方法传递一个选项对象，该对象具有与上述 `createMicroservice()` 方法中显示的相同属性，以及一个 `name` 属性，用作注入令牌。更多关于 `ClientsModule` 的信息[点击这里](https://docs.nestjs.com/microservices/basics#client)。
 
 ```typescript
 @Module({
@@ -90,11 +90,11 @@ One method for creating an instance is to use the `ClientsModule`. To create a c
 })
 ```
 
-Other options to create a client (either `ClientProxyFactory` or `@Client()`) can be used as well. You can read about them <a href="https://docs.nestjs.com/microservices/basics#client">here</a>.
+也可以使用其他选项创建客户端（无论是 `ClientProxyFactory` 还是 `@Client()`）。你可以[点击这里](https://docs.nestjs.com/microservices/basics#client)了解更多信息。
 
-#### Context
+#### 上下文
 
-In more sophisticated scenarios, you may want to access more information about the incoming request. When using the Redis transporter, you can access the `RedisContext` object.
+在更复杂的情况下，你可能想要访问更多关于传入请求的信息。当使用 Redis 传输器时，你可以访问 `RedisContext` 对象。
 
 ```typescript
 @@filename()
@@ -110,4 +110,4 @@ getNotifications(data, context) {
 }
 ```
 
-> info **Hint** `@Payload()`, `@Ctx()` and `RedisContext` are imported from the `@nestjs/microservices` package.
+> 信息提示 **提示** `@Payload()`, `@Ctx()` 和 `RedisContext` 是从 `@nestjs/microservices` 包导入的。

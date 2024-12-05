@@ -1,6 +1,6 @@
 ### HTTPS
 
-To create an application that uses the HTTPS protocol, set the `httpsOptions` property in the options object passed to the `create()` method of the `NestFactory` class:
+要创建一个使用HTTPS协议的应用程序，在传递给`NestFactory`类的`create()`方法的选项对象中设置`httpsOptions`属性：
 
 ```typescript
 const httpsOptions = {
@@ -13,7 +13,7 @@ const app = await NestFactory.create(AppModule, {
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-If you use the `FastifyAdapter`, create the application as follows:
+如果您使用`FastifyAdapter`，请按照以下方式创建应用程序：
 
 ```typescript
 const app = await NestFactory.create<NestFastifyApplication>(
@@ -22,9 +22,9 @@ const app = await NestFactory.create<NestFastifyApplication>(
 );
 ```
 
-#### Multiple simultaneous servers
+#### 多个同时监听的服务器
 
-The following recipe shows how to instantiate a Nest application that listens on multiple ports (for example, on a non-HTTPS port and an HTTPS port) simultaneously.
+以下示例展示了如何实例化一个同时监听多个端口（例如，非HTTPS端口和HTTPS端口）的Nest应用程序。
 
 ```typescript
 const httpsOptions = {
@@ -40,7 +40,7 @@ const httpServer = http.createServer(server).listen(3000);
 const httpsServer = https.createServer(httpsOptions, server).listen(443);
 ```
 
-Because we called `http.createServer` / `https.createServer` ourselves, NestJS doesn't close them when calling `app.close` / on termination signal. We need to do this ourselves:
+因为我们自己调用了`http.createServer` / `https.createServer`，所以在调用`app.close` / 终止信号时NestJS不会关闭它们。我们需要自己来做：
 
 ```typescript
 @Injectable()
@@ -74,6 +74,6 @@ shutdownObserver.addHttpServer(httpServer);
 shutdownObserver.addHttpServer(httpsServer);
 ```
 
-> info **Hint** The `ExpressAdapter` is imported from the `@nestjs/platform-express` package. The `http` and `https` packages are native Node.js packages.
+> 信息 **提示** `ExpressAdapter` 从 `@nestjs/platform-express` 包中导入。`http` 和 `https` 包是原生的Node.js包。
 
-> **Warning** This recipe does not work with [GraphQL Subscriptions](/graphql/subscriptions).
+> **警告** 这个示例不适用于 [GraphQL Subscriptions](/graphql/subscriptions)。

@@ -1,14 +1,14 @@
-### Field middleware
+### 字段中间件
 
-> warning **Warning** This chapter applies only to the code first approach.
+> 警告 **警告** 本章节仅适用于代码优先方法。
 
-Field Middleware lets you run arbitrary code **before or after** a field is resolved. A field middleware can be used to convert the result of a field, validate the arguments of a field, or even check field-level roles (for example, required to access a target field for which a middleware function is executed).
+字段中间件允许您在字段解析前后运行任意代码。字段中间件可用于转换字段结果、验证字段参数，甚至检查字段级别的角色（例如，需要访问执行中间件函数的目标字段）。
 
-You can connect multiple middleware functions to a field. In this case, they will be called sequentially along the chain where the previous middleware decides to call the next one. The order of the middleware functions in the `middleware` array is important. The first resolver is the "most-outer" layer, so it gets executed first and last (similarly to the `graphql-middleware` package). The second resolver is the "second-outer" layer, so it gets executed second and second to last.
+您可以将多个中间件函数连接到一个字段。在这种情况下，它们将按顺序沿链被调用，前一个中间件决定调用下一个中间件。中间件函数在 `middleware` 数组中的顺序很重要。第一个解析器是最外层，因此它首先和最后执行（类似于 `graphql-middleware` 包）。第二个解析器是第二外层，因此它第二和倒数第二执行。
 
-#### Getting started
+#### 开始使用
 
-Let's start off by creating a simple middleware that will log a field value before it's sent back to the client:
+让我们从一个简单的中间件开始，该中间件将在字段值发送回客户端之前记录它：
 
 ```typescript
 import { FieldMiddleware, MiddlewareContext, NextFn } from '@nestjs/graphql';
@@ -23,13 +23,13 @@ const loggerMiddleware: FieldMiddleware = async (
 };
 ```
 
-> info **Hint** The `MiddlewareContext` is an object that consist of the same arguments that are normally received by the GraphQL resolver function (`{{ '{' }} source, args, context, info {{ '}' }}`), while `NextFn` is a function that let you execute the next middleware in the stack (bound to this field) or the actual field resolver.
+> 提示 **提示** `MiddlewareContext` 是一个对象，包含通常由 GraphQL 解析器函数接收的相同参数（`{ source, args, context, info }`），而 `NextFn` 是一个函数，允许您执行堆栈中的下一个中间件（绑定到该字段）或实际字段解析器。
 
-> warning **Warning** Field middleware functions cannot inject dependencies nor access Nest's DI container as they are designed to be very lightweight and shouldn't perform any potentially time-consuming operations (like retrieving data from the database). If you need to call external services/query data from the data source, you should do it in a guard/interceptor bounded to a root query/mutation handler and assign it to `context` object which you can access from within the field middleware (specifically, from the `MiddlewareContext` object).
+> 警告 **警告** 字段中间件函数不能注入依赖项，也不能访问 Nest 的 DI 容器，因为它们被设计为非常轻量级，不应该执行任何可能耗时的操作（比如从数据库检索数据）。如果您需要调用外部服务/从数据源查询数据，您应该在绑定到根查询/突变处理器的守卫/拦截器中执行此操作，并将其分配给 `context` 对象，您可以在字段中间件中从 `MiddlewareContext` 对象中访问它。
 
-Note that field middleware must match the `FieldMiddleware` interface. In the example above, we first run the `next()` function (which executes the actual field resolver and returns a field value) and then, we log this value to our terminal. Also, the value returned from the middleware function completely overrides the previous value and since we don't want to perform any changes, we simply return the original value.
+请注意，字段中间件必须匹配 `FieldMiddleware` 接口。在上面的例子中，我们首先运行 `next()` 函数（执行实际字段解析器并返回字段值），然后，我们将这个值记录到我们的终端。同样，从中间件函数返回的值完全覆盖了前一个值，由于我们不想执行任何更改，我们简单地返回原始值。
 
-With this in place, we can register our middleware directly in the `@Field()` decorator, as follows:
+有了这个，我们可以直接在 `@Field()` 装饰器中注册我们的中间件，如下所示：
 
 ```typescript
 @ObjectType()
@@ -39,22 +39,22 @@ export class Recipe {
 }
 ```
 
-Now whenever we request the `title` field of `Recipe` object type, the original field's value will be logged to the console.
+现在，每当我们请求 `Recipe` 对象类型的 `title` 字段时，原始字段的值将被记录到控制台。
 
-> info **Hint** To learn how you can implement a field-level permissions system with the use of [extensions](/graphql/extensions) feature, check out this [section](/graphql/extensions#using-custom-metadata).
+> 提示 **提示** 要了解如何使用 [extensions](/graphql/extensions) 功能实现字段级权限系统，请查看此 [部分](/graphql/extensions#using-custom-metadata)。
 
-> warning **Warning** Field middleware can be applied only to `ObjectType` classes. For more details, check out this [issue](https://github.com/nestjs/graphql/issues/2446).
+> 警告 **警告** 字段中间件只能应用于 `ObjectType` 类。更多详情，请查看此 [问题](https://github.com/nestjs/graphql/issues/2446)。
 
-Also, as mentioned above, we can control the field's value from within the middleware function. For demonstration purposes, let's capitalise a recipe's title (if present):
+同样，如上所述，我们可以在中间件函数内控制字段的值。为了演示，让我们将食谱的标题（如果存在）大写：
 
 ```typescript
 const value = await next();
 return value?.toUpperCase();
 ```
 
-In this case, every title will be automatically uppercased, when requested.
+在这种情况下，每个标题在请求时将自动大写。
 
-Likewise, you can bind a field middleware to a custom field resolver (a method annotated with the `@ResolveField()` decorator), as follows:
+同样，您可以将字段中间件绑定到自定义字段解析器（用 `@ResolveField()` 装饰器注解的方法），如下所示：
 
 ```typescript
 @ResolveField(() => String, { middleware: [loggerMiddleware] })
@@ -63,11 +63,11 @@ title() {
 }
 ```
 
-> warning **Warning** In case enhancers are enabled at the field resolver level ([read more](/graphql/other-features#execute-enhancers-at-the-field-resolver-level)), field middleware functions will run before any interceptors, guards, etc., **bounded to the method** (but after the root-level enhancers registered for query or mutation handlers).
+> 警告 **警告** 如果在字段解析器级别启用了增强器（[了解更多](/graphql/other-features#execute-enhancers-at-the-field-resolver-level)），字段中间件函数将在任何绑定到方法的拦截器、守卫等之前运行（但在为查询或突变处理器注册的根级增强器之后）。
 
-#### Global field middleware
+#### 全局字段中间件
 
-In addition to binding a middleware directly to a specific field, you can also register one or multiple middleware functions globally. In this case, they will be automatically connected to all fields of your object types.
+除了直接将中间件绑定到特定字段外，您还可以注册一个或多个全局中间件函数。在这种情况下，它们将自动连接到您的对象类型的所有字段。
 
 ```typescript
 GraphQLModule.forRoot({
@@ -78,4 +78,4 @@ GraphQLModule.forRoot({
 }),
 ```
 
-> info **Hint** Globally registered field middleware functions will be executed **before** locally registered ones (those bound directly to specific fields).
+> 提示 **提示** 全局注册的字段中间件函数将在本地注册的中间件函数之前执行（那些直接绑定到特定字段的）。

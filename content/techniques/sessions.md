@@ -1,21 +1,16 @@
-### Session
+### 会话
+**HTTP会话**提供了一种在多个请求之间存储用户信息的方法，这对于[MVC](/techniques/mvc)应用程序特别有用。
 
-**HTTP sessions** provide a way to store information about the user across multiple requests, which is particularly useful for [MVC](/techniques/mvc) applications.
-
-#### Use with Express (default)
-
-First install the [required package](https://github.com/expressjs/session) (and its types for TypeScript users):
-
+#### 在Express中使用（默认）
+首先安装[所需的包](https://github.com/expressjs/session)（以及TypeScript用户的类型定义）：
 ```shell
 $ npm i express-session
 $ npm i -D @types/express-session
 ```
-
-Once the installation is complete, apply the `express-session` middleware as global middleware (for example, in your `main.ts` file).
-
+安装完成后，将`express-session`中间件作为全局中间件应用（例如，在您的`main.ts`文件中）。
 ```typescript
 import * as session from 'express-session';
-// somewhere in your initialization file
+// 在您的初始化文件中的某个位置
 app.use(
   session({
     secret: 'my-secret',
@@ -24,55 +19,46 @@ app.use(
   }),
 );
 ```
+> 警告 **注意** 默认的服务器端会话存储并不适合生产环境。它在大多数情况下会泄露内存，不能扩展到单个进程之外，并且仅用于调试和开发。更多信息请阅读[官方仓库](https://github.com/expressjs/session)。
 
-> warning **Notice** The default server-side session storage is purposely not designed for a production environment. It will leak memory under most conditions, does not scale past a single process, and is meant for debugging and developing. Read more in the [official repository](https://github.com/expressjs/session).
+`secret`用于签名会话ID cookie。这可以是用于单个密钥的字符串，或者用于多个密钥的数组。如果提供了密钥数组，只有第一个元素将用于签名会话ID cookie，而所有元素在请求中验证签名时都会被考虑。密钥本身不应该容易被人解析，最好是一组随机字符。
 
-The `secret` is used to sign the session ID cookie. This can be either a string for a single secret, or an array of multiple secrets. If an array of secrets is provided, only the first element will be used to sign the session ID cookie, while all the elements will be considered when verifying the signature in requests. The secret itself should be not easily parsed by a human and would best be a random set of characters.
+启用`resave`选项会强制将未在请求中修改的会话保存回会话存储。默认值是`true`，但使用默认值已被弃用，因为默认值将来会改变。
 
-Enabling the `resave` option forces the session to be saved back to the session store, even if the session was never modified during the request. The default value is `true`, but using the default has been deprecated, as the default will change in the future.
+同样，启用`saveUninitialized`选项会强制将“未初始化”的会话保存到存储中。当会话是新的但未被修改时，会话就是未初始化的。选择`false`对于实现登录会话、减少服务器存储使用或遵守要求在设置cookie之前获得许可的法律很有用。选择`false`还可以帮助解决客户端在没有会话的情况下并行发出多个请求的竞态条件（来源：[链接](https://github.com/expressjs/session#saveuninitialized)）。
 
-Likewise, enabling the `saveUninitialized` option Forces a session that is "uninitialized" to be saved to the store. A session is uninitialized when it is new but not modified. Choosing `false` is useful for implementing login sessions, reducing server storage usage, or complying with laws that require permission before setting a cookie. Choosing `false` will also help with race conditions where a client makes multiple parallel requests without a session ([source](https://github.com/expressjs/session#saveuninitialized)).
+您可以向`session`中间件传递其他几个选项，更多信息请阅读[API文档](https://github.com/expressjs/session#options)。
 
-You can pass several other options to the `session` middleware, read more about them in the [API documentation](https://github.com/expressjs/session#options).
+> 提示 **提示** 请注意`secure: true`是一个推荐的选项。但是，它需要一个启用了https的网站，即需要HTTPS才能设置安全的cookie。如果设置了secure，并且您通过HTTP访问您的网站，cookie将不会被设置。如果您的node.js在代理后面，并且使用了`secure: true`，您需要在express中设置`\"trust proxy\"`。
 
-> info **Hint** Please note that `secure: true` is a recommended option. However, it requires an https-enabled website, i.e., HTTPS is necessary for secure cookies. If secure is set, and you access your site over HTTP, the cookie will not be set. If you have your node.js behind a proxy and are using `secure: true`, you need to set `"trust proxy"` in express.
-
-With this in place, you can now set and read session values from within the route handlers, as follows:
-
+有了这些设置，您现在可以在路由处理程序中设置和读取会话值，如下所示：
 ```typescript
 @Get()
 findAll(@Req() request: Request) {
   request.session.visits = request.session.visits ? request.session.visits + 1 : 1;
 }
 ```
+> 提示 **提示** `@Req()`装饰器从`@nestjs/common`导入，而`Request`从`express`包导入。
 
-> info **Hint** The `@Req()` decorator is imported from the `@nestjs/common`, while `Request` from the `express` package.
-
-Alternatively, you can use the `@Session()` decorator to extract a session object from the request, as follows:
-
+或者，您可以使用`@Session()`装饰器从请求中提取会话对象，如下所示：
 ```typescript
 @Get()
 findAll(@Session() session: Record<string, any>) {
   session.visits = session.visits ? session.visits + 1 : 1;
 }
 ```
+> 提示 **提示** `@Session()`装饰器从`@nestjs/common`包导入。
 
-> info **Hint** The `@Session()` decorator is imported from the `@nestjs/common` package.
-
-#### Use with Fastify
-
-First install the required package:
-
+#### 在Fastify中使用
+首先安装所需的包：
 ```shell
 $ npm i @fastify/secure-session
 ```
-
-Once the installation is complete, register the `fastify-secure-session` plugin:
-
+安装完成后，注册`fastify-secure-session`插件：
 ```typescript
 import secureSession from '@fastify/secure-session';
 
-// somewhere in your initialization file
+// 在您的初始化文件中的某个位置
 const app = await NestFactory.create<NestFastifyApplication>(
   AppModule,
   new FastifyAdapter(),
@@ -82,13 +68,11 @@ await app.register(secureSession, {
   salt: 'mq9hDxBVDbspDR6n',
 });
 ```
+> 提示 **提示** 您也可以预生成一个密钥（[查看说明](https://github.com/fastify/fastify-secure-session)）或使用[密钥轮换](https://github.com/fastify/fastify-secure-session#using-keys-with-key-rotation)。
 
-> info **Hint** You can also pregenerate a key ([see instructions](https://github.com/fastify/fastify-secure-session)) or use [keys rotation](https://github.com/fastify/fastify-secure-session#using-keys-with-key-rotation).
+更多可用选项的信息，请阅读[官方仓库](https://github.com/fastify/fastify-secure-session)。
 
-Read more about the available options in the [official repository](https://github.com/fastify/fastify-secure-session).
-
-With this in place, you can now set and read session values from within the route handlers, as follows:
-
+有了这些设置，您现在可以在路由处理程序中设置和读取会话值，如下所示：
 ```typescript
 @Get()
 findAll(@Req() request: FastifyRequest) {
@@ -96,9 +80,7 @@ findAll(@Req() request: FastifyRequest) {
   request.session.set('visits', visits ? visits + 1 : 1);
 }
 ```
-
-Alternatively, you can use the `@Session()` decorator to extract a session object from the request, as follows:
-
+或者，您可以使用`@Session()`装饰器从请求中提取会话对象，如下所示：
 ```typescript
 @Get()
 findAll(@Session() session: secureSession.Session) {
@@ -106,5 +88,4 @@ findAll(@Session() session: secureSession.Session) {
   session.set('visits', visits ? visits + 1 : 1);
 }
 ```
-
-> info **Hint** The `@Session()` decorator is imported from the `@nestjs/common`, while `secureSession.Session` from the `@fastify/secure-session` package (import statement: `import * as secureSession from '@fastify/secure-session'`).
+> 提示 **提示** `@Session()`装饰器从`@nestjs/common`导入，而`secureSession.Session`从`@fastify/secure-session`包导入（导入语句：`import * as secureSession from '@fastify/secure-session'`）。

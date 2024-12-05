@@ -1,38 +1,36 @@
-### Migration guide
+### 迁移指南
 
-If you're currently using `@nestjs/swagger@3.*`, note the following breaking/API changes in version 4.0.
+如果您目前正在使用 `@nestjs/swagger@3.*`，请留意版本 4.0 中的以下破坏性/API变更。
 
-#### Breaking changes
+#### 破坏性变更
 
-The following decorators have been changed/renamed:
+以下装饰器已更改/重命名：
 
-- `@ApiModelProperty` is now `@ApiProperty`
-- `@ApiModelPropertyOptional` is now `@ApiPropertyOptional`
-- `@ApiResponseModelProperty` is now `@ApiResponseProperty`
-- `@ApiImplicitQuery` is now `@ApiQuery`
-- `@ApiImplicitParam` is now `@ApiParam`
-- `@ApiImplicitBody` is now `@ApiBody`
-- `@ApiImplicitHeader` is now `@ApiHeader`
-- `@ApiOperation({{ '{' }} title: 'test' {{ '}' }})` is now `@ApiOperation({{ '{' }} summary: 'test' {{ '}' }})`
-- `@ApiUseTags` is now `@ApiTags`
+- `@ApiModelProperty` 现在是 `@ApiProperty`
+- `@ApiModelPropertyOptional` 现在是 `@ApiPropertyOptional`
+- `@ApiResponseModelProperty` 现在是 `@ApiResponseProperty`
+- `@ApiImplicitQuery` 现在是 `@ApiQuery`
+- `@ApiImplicitParam` 现在是 `@ApiParam`
+- `@ApiImplicitBody` 现在是 `@ApiBody`
+- `@ApiImplicitHeader` 现在是 `@ApiHeader`
+- `@ApiOperation({{ '{' }} title: 'test' {{ '}' }})` 现在是 `@ApiOperation({{ '{' }} summary: 'test' {{ '}' }})`
+- `@ApiUseTags` 现在是 `@ApiTags`
 
-`DocumentBuilder` breaking changes (updated method signatures):
+`DocumentBuilder` 破坏性变更（更新的方法签名）：
 
 - `addTag`
 - `addBearerAuth`
 - `addOAuth2`
-- `setContactEmail` is now `setContact`
-- `setHost` has been removed
-- `setSchemes` has been removed (use the `addServer` instead, e.g., `addServer('http://')`)
+- `setContactEmail` 现在是 `setContact`
+- `setHost` 已被移除
+- `setSchemes` 已被移除（使用 `addServer` 替代，例如 `addServer('http://')`）
 
-#### New methods
+#### 新增方法
 
-The following methods have been added:
+以下方法已添加：
 
 - `addServer`
 - `addApiKey`
 - `addBasicAuth`
 - `addSecurity`
 - `addSecurityRequirements`
-
-<app-banner-devtools></app-banner-devtools>

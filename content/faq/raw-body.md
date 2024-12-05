@@ -1,26 +1,24 @@
-### Raw body
+获取原始请求体的最常见用例之一是执行Webhook签名验证。通常，为了执行Webhook签名验证，需要未序列化的请求体来计算HMAC哈希。
 
-One of the most common use-case for having access to the raw request body is performing webhook signature verifications. Usually to perform webhook signature validations the unserialized request body is required to calculate an HMAC hash.
+> 警告 **警告** 此功能只能在启用内置全局body解析器中间件时使用，即在创建应用时不能传递 `bodyParser: false`。
 
-> warning **Warning** This feature can be used only if the built-in global body parser middleware is enabled, ie., you must not pass `bodyParser: false` when creating the app.
+#### 在Express中使用
 
-#### Use with Express
-
-First enable the option when creating your Nest Express application:
+首先，在创建Nest Express应用程序时启用此选项：
 
 ```typescript
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 
-// in the "bootstrap" function
+// 在 "bootstrap" 函数中
 const app = await NestFactory.create<NestExpressApplication>(AppModule, {
   rawBody: true,
 });
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-To access the raw request body in a controller, a convenience interface `RawBodyRequest` is provided to expose a `rawBody` field on the request: use the interface `RawBodyRequest` type:
+在控制器中访问原始请求体，提供了一个方便的接口 `RawBodyRequest` 来在请求上暴露一个 `rawBody` 字段：使用接口 `RawBodyRequest` 类型：
 
 ```typescript
 import { Controller, Post, RawBodyRequest, Req } from '@nestjs/common';
@@ -30,36 +28,36 @@ import { Request } from 'express';
 class CatsController {
   @Post()
   create(@Req() req: RawBodyRequest<Request>) {
-    const raw = req.rawBody; // returns a `Buffer`.
+    const raw = req.rawBody; // 返回一个 `Buffer`。
   }
 }
 ```
 
-#### Registering a different parser
+#### 注册不同的解析器
 
-By default, only `json` and `urlencoded` parsers are registered. If you want to register a different parser on the fly, you will need to do so explicitly.
+默认情况下，只注册了 `json` 和 `urlencoded` 解析器。如果你想要在运行时注册不同的解析器，你需要显式这样做。
 
-For example, to register a `text` parser, you can use the following code:
+例如，要注册一个 `text` 解析器，你可以使用以下代码：
 
 ```typescript
 app.useBodyParser('text');
 ```
 
-> warning **Warning** Ensure that you are providing the correct application type to the `NestFactory.create` call. For Express applications, the correct type is `NestExpressApplication`. Otherwise the `.useBodyParser` method will not be found.
+> 警告 **警告** 确保你在 `NestFactory.create` 调用中提供了正确的应用程序类型。对于Express应用程序，正确的类型是 `NestExpressApplication`。否则 `.useBodyParser` 方法将找不到。
 
-#### Body parser size limit
+#### 体解析器大小限制
 
-If your application needs to parse a body larger than the default `100kb` of Express, use the following:
+如果你的应用程序需要解析大于Express默认的 `100kb` 的体，使用以下代码：
 
 ```typescript
 app.useBodyParser('json', { limit: '10mb' });
 ```
 
-The `.useBodyParser` method will respect the `rawBody` option that is passed in the application options.
+`.useBodyParser` 方法将尊重传递给应用程序选项的 `rawBody` 选项。
 
-#### Use with Fastify
+#### 在Fastify中使用
 
-First enable the option when creating your Nest Fastify application:
+首先，在创建Nest Fastify应用程序时启用此选项：
 
 ```typescript
 import { NestFactory } from '@nestjs/core';
@@ -69,7 +67,7 @@ import {
 } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 
-// in the "bootstrap" function
+// 在 "bootstrap" 函数中
 const app = await NestFactory.create<NestFastifyApplication>(
   AppModule,
   new FastifyAdapter(),
@@ -80,7 +78,7 @@ const app = await NestFactory.create<NestFastifyApplication>(
 await app.listen(process.env.PORT ?? 3000);
 ```
 
-To access the raw request body in a controller, a convenience interface `RawBodyRequest` is provided to expose a `rawBody` field on the request: use the interface `RawBodyRequest` type:
+在控制器中访问原始请求体，提供了一个方便的接口 `RawBodyRequest` 来在请求上暴露一个 `rawBody` 字段：使用接口 `RawBodyRequest` 类型：
 
 ```typescript
 import { Controller, Post, RawBodyRequest, Req } from '@nestjs/common';
@@ -90,30 +88,30 @@ import { FastifyRequest } from 'fastify';
 class CatsController {
   @Post()
   create(@Req() req: RawBodyRequest<FastifyRequest>) {
-    const raw = req.rawBody; // returns a `Buffer`.
+    const raw = req.rawBody; // 返回一个 `Buffer`。
   }
 }
 ```
 
-#### Registering a different parser
+#### 注册不同的解析器
 
-By default, only `application/json` and `application/x-www-form-urlencoded` parsers are registered. If you want to register a different parser on the fly, you will need to do so explicitly.
+默认情况下，只注册了 `application/json` 和 `application/x-www-form-urlencoded` 解析器。如果你想要在运行时注册不同的解析器，你需要显式这样做。
 
-For example, to register a `text/plain` parser, you can use the following code:
+例如，要注册一个 `text/plain` 解析器，你可以使用以下代码：
 
 ```typescript
 app.useBodyParser('text/plain');
 ```
 
-> warning **Warning** Ensure that you are providing the correct application type to the `NestFactory.create` call. For Fastify applications, the correct type is `NestFastifyApplication`. Otherwise the `.useBodyParser` method will not be found.
+> 警告 **警告** 确保你在 `NestFactory.create` 调用中提供了正确的应用程序类型。对于Fastify应用程序，正确的类型是 `NestFastifyApplication`。否则 `.useBodyParser` 方法将找不到。
 
-#### Body parser size limit
+#### 体解析器大小限制
 
-If your application needs to parse a body larger than the default 1MiB of Fastify, use the following:
+如果你的应用程序需要解析大于Fastify默认的1MiB的体，使用以下代码：
 
 ```typescript
 const bodyLimit = 10_485_760; // 10MiB
 app.useBodyParser('application/json', { bodyLimit });
 ```
 
-The `.useBodyParser` method will respect the `rawBody` option that is passed in the application options.
+`.useBodyParser` 方法将尊重传递给应用程序选项的 `rawBody` 选项。

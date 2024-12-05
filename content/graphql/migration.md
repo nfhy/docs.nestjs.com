@@ -1,49 +1,49 @@
-### Migrating to v11 from v10
+### 从 v10 迁移到 v11
 
-This chapter provides a set of guidelines for migrating from `@nestjs/graphql` version 10 to version 11. As part of this major release, we updated the Apollo driver to be compatible with Apollo Server v4 (instead of v3). Note: there are several breaking changes in Apollo Server v4 (especially around plugins and ecosystem packages), so you'll have to update your codebase accordingly. For more information, see the [Apollo Server v4 migration guide](https://www.apollographql.com/docs/apollo-server/migration/).
+本章节提供了从 `@nestjs/graphql` 版本 10 迁移到版本 11 的一系列指南。在这个主要版本发布中，我们更新了 Apollo 驱动，使其与 Apollo Server v4（而不是 v3）兼容。注意：Apollo Server v4 中有几个重大变更（特别是在插件和生态系统包方面），因此您必须相应地更新代码库。更多信息，请参见 [Apollo Server v4 迁移指南](https://www.apollographql.com/docs/apollo-server/migration/)。
 
-#### Apollo packages
+#### Apollo 包
 
-Instead of installing the `apollo-server-express` package, you'll have to install `@apollo/server`:
+您不再需要安装 `apollo-server-express` 包，而是需要安装 `@apollo/server`：
 
 ```bash
 $ npm uninstall apollo-server-express
 $ npm install @apollo/server
 ```
 
-If you use the Fastify adapter, you'll have to install the `@as-integrations/fastify` package instead:
+如果您使用 Fastify 适配器，则需要安装 `@as-integrations/fastify` 包：
 
 ```bash
 $ npm uninstall apollo-server-fastify
 $ npm install @apollo/server @as-integrations/fastify
 ```
 
-#### Mercurius packages
+#### Mercurius 包
 
-Mercurius gateway is no longer a part of the `mercurius` package. Instead, you'll have to install the `@mercuriusjs/gateway` package separately:
+Mercurius 网关不再是 `mercurius` 包的一部分。相反，您需要单独安装 `@mercuriusjs/gateway` 包：
 
 ```bash
 $ npm install @mercuriusjs/gateway
 ```
 
-Similarly, for creating federated schemas, you'll have to install the `@mercuriusjs/federation` package:
+同样，对于创建联合模式，您需要安装 `@mercuriusjs/federation` 包：
 
 ```bash
 $ npm install @mercuriusjs/federation
 ```
 
-### Migrating to v10 from v9
+### 从 v9 迁移到 v10
 
-This chapter provides a set of guidelines for migrating from `@nestjs/graphql` version 9 to version 10. The focus of this major-version release is to provide a lighter, platform-agnostic core library.
+本章节提供了从 `@nestjs/graphql` 版本 9 迁移到版本 10 的一系列指南。这个主要版本发布的重点是提供一个更轻量级、平台无关的核心库。
 
-#### Introducing "driver" packages
+#### 引入“驱动”包
 
-In the latest version, we made a decision to break the `@nestjs/graphql` package up into a few separate libraries, letting you choose whether to use Apollo (`@nestjs/apollo`), Mercurius (`@nestjs/mercurius`), or another GraphQL library in your project.
+在最新版本中，我们决定将 `@nestjs/graphql` 包拆分成几个独立的库，让您选择在项目中使用 Apollo（`@nestjs/apollo`）、Mercurius（`@nestjs/mercurius`）或其他 GraphQL 库。
 
-This implies that now you have to explicitly specify what driver your application will use.
+这意味着现在您必须明确指定应用程序将使用哪种驱动。
 
 ```typescript
-// Before
+// 之前
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 
@@ -56,7 +56,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 })
 export class AppModule {}
 
-// After
+// 之后
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -72,24 +72,24 @@ import { GraphQLModule } from '@nestjs/graphql';
 export class AppModule {}
 ```
 
-#### Plugins
+#### 插件
 
-Apollo Server plugins let you perform custom operations in response to certain events. Since this is an exclusive Apollo feature, we moved it from the `@nestjs/graphql` to the newly created `@nestjs/apollo` package so you'll have to update imports in your application.
+Apollo Server 插件允许您在响应某些事件时执行自定义操作。由于这是 Apollo 的独有特性，我们将其从 `@nestjs/graphql` 移动到了新创建的 `@nestjs/apollo` 包中，因此您需要更新应用程序中的导入。
 
 ```typescript
-// Before
+// 之前
 import { Plugin } from '@nestjs/graphql';
 
-// After
+// 之后
 import { Plugin } from '@nestjs/apollo';
 ```
 
-#### Directives
+#### 指令
 
-`schemaDirectives` feature has been replaced with the new [Schema directives API](https://www.graphql-tools.com/docs/schema-directives) in v8 of `@graphql-tools/schema` package.
+`schemaDirectives` 特性已被新的 [Schema directives API](https://www.graphql-tools.com/docs/schema-directives) 在 `@graphql-tools/schema` 包的 v8 中取代。
 
 ```typescript
-// Before
+// 之前
 import { SchemaDirectiveVisitor } from '@graphql-tools/utils';
 import { defaultFieldResolver, GraphQLField } from 'graphql';
 
@@ -106,7 +106,7 @@ export class UpperCaseDirective extends SchemaDirectiveVisitor {
   }
 }
 
-// After
+// 之后
 import { getDirective, MapperKind, mapSchema } from '@graphql-tools/utils';
 import { defaultFieldResolver, GraphQLSchema } from 'graphql';
 
@@ -125,8 +125,7 @@ export function upperDirectiveTransformer(
       if (upperDirective) {
         const { resolve = defaultFieldResolver } = fieldConfig;
 
-        // Replace the original resolver with a function that *first* calls
-        // the original resolver, then converts its result to upper case
+        // 替换原始解析器，首先调用原始解析器，然后将结果转换为大写
         fieldConfig.resolve = async function (source, args, context, info) {
           const result = await resolve(source, args, context, info);
           if (typeof result === 'string') {
@@ -139,9 +138,10 @@ export function upperDirectiveTransformer(
     },
   });
 }
+
 ```
 
-To apply this directive implementation to a schema that contains `@upper` directives, use the `transformSchema` function:
+要将这个指令实现应用于包含 `@upper` 指令的模式，请使用 `transformSchema` 函数：
 
 ```typescript
 GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -150,29 +150,29 @@ GraphQLModule.forRoot<ApolloDriverConfig>({
 })
 ```
 
-#### Federation
+#### 联合
 
-`GraphQLFederationModule` has been removed and replaced with the corresponding driver class:
+`GraphQLFederationModule` 已被移除，并被相应的驱动类取代：
 
 ```typescript
-// Before
+// 之前
 GraphQLFederationModule.forRoot({
   autoSchemaFile: true,
 });
 
-// After
+// 之后
 GraphQLModule.forRoot<ApolloFederationDriverConfig>({
   driver: ApolloFederationDriver,
   autoSchemaFile: true,
 });
 ```
 
-> info **Hint** Both `ApolloFederationDriver` class and `ApolloFederationDriverConfig` are exported from the `@nestjs/apollo` package.
+> info **提示** `ApolloFederationDriver` 类和 `ApolloFederationDriverConfig` 都从 `@nestjs/apollo` 包中导出。
 
-Likewise, instead of using a dedicated `GraphQLGatewayModule`, simply pass the appropriate `driver` class to your `GraphQLModule` settings:
+同样，而不是使用专门的 `GraphQLGatewayModule`，只需将适当的 `driver` 类传递给您的 `GraphQLModule` 设置：
 
 ```typescript
-// Before
+// 之前
 GraphQLGatewayModule.forRoot({
   gateway: {
     supergraphSdl: new IntrospectAndCompose({
@@ -184,7 +184,7 @@ GraphQLGatewayModule.forRoot({
   },
 });
 
-// After
+// 之后
 GraphQLModule.forRoot<ApolloGatewayDriverConfig>({
   driver: ApolloGatewayDriver,
   gateway: {
@@ -198,4 +198,4 @@ GraphQLModule.forRoot<ApolloGatewayDriverConfig>({
 });
 ```
 
-> info **Hint** Both `ApolloGatewayDriver` class and `ApolloGatewayDriverConfig` are exported from the `@nestjs/apollo` package.
+> info **提示** `ApolloGatewayDriver` 类和 `ApolloGatewayDriverConfig` 都从 `@nestjs/apollo` 包中导出。
